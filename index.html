@@ -1,1 +1,2424 @@
 
+<!doctype html>
+<html lang="en" data-bs-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Our Story - Relationship Dashboard</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@400;700&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/particles.js/2.0.0/particles.min.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+
+    <style>
+        /* Keep color variables and base styles */
+        :root {
+            --bs-pink: #ec4899; /* Map pink */
+            --bs-teal: #14b8a6; /* Map teal */
+            --custom-pink-light: #fdf2f8;
+            --custom-teal-light: #f0fdfa;
+            --custom-pink-dark-bg: #4a304d;
+            --custom-teal-dark-bg: #2c5282;
+            --bs-primary-rgb: 236, 72, 153; /* Set primary to pink for btn-primary etc. */
+            --bs-primary: var(--bs-pink);
+            --bs-body-bg-rgb: 254, 246, 246; /* Default light bg */
+            --bs-body-color-rgb: 51, 51, 51; /* Default text color */
+        }
+
+        [data-bs-theme="dark"] {
+             --bs-body-bg-rgb: 26, 32, 44; /* #1a202c */
+             --bs-body-color-rgb: 226, 232, 240; /* #e2e8f0 */
+             --bs-tertiary-bg-rgb: 45, 55, 72; /* #2d3748 for nav/footer */
+             --bs-secondary-bg-rgb: 45, 55, 72; /* #2d3748 for card bg */
+             --bs-border-color-rgb: 74, 85, 104; /* #4a5568 */
+             --custom-pink-light: var(--custom-pink-dark-bg);
+             --custom-teal-light: var(--custom-teal-dark-bg);
+             --bs-pink: #f687b3; /* Lighter pink for dark mode text */
+             --bs-teal: #68d391; /* Lighter teal for dark mode text */
+        }
+
+        * { font-family: 'Poppins', sans-serif; transition: all 0.3s ease; }
+        .script-font { font-family: 'Dancing Script', cursive; }
+
+        body { overflow-x: hidden; } /* Prevent horizontal scroll */
+
+        /* Initial State: Hide Dashboard, Show Login */
+        #dashboard-content { display: none; }
+        #login-page {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(120deg, #fdf2f8, #f0fdfa, #fdf2f8); /* Light gradient */
+        }
+        [data-bs-theme="dark"] #login-page {
+             background: linear-gradient(120deg, #2d3748, #1a202c, #2d3748); /* Dark gradient */
+        }
+        .login-card {
+            max-width: 400px;
+            width: 90%;
+        }
+
+        /* Adapt card hover slightly for Bootstrap */
+        .card:not(.modal-content):not(.login-card):hover { /* Exclude modal/login card */
+            transform: translateY(-5px);
+            box-shadow: 0 1rem 1.5rem rgba(0,0,0, .175) !important; /* Use Bootstrap's shadow intensity */
+        }
+
+        /* Keep floating animation */
+        .floating { animation: floating 3s ease-in-out infinite; }
+        @keyframes floating { 0% { transform: translateY(0); } 50% { transform: translateY(-10px); } 100% { transform: translateY(0); } }
+
+        /* Keep gradient */
+        .gradient-bg { background: linear-gradient(120deg, #ffdde1, #ee9ca7, #ffdde1); background-size: 200% 200%; animation: gradient 15s ease infinite; }
+        @keyframes gradient { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
+
+        /* Keep particle container style */
+        #particles-js { position: fixed; /* Changed to fixed for login */ width: 100%; height: 100%; top: 0; left: 0; z-index: -1; }
+
+        /* Custom background colors using variables */
+        .bg-custom-pink-light { background-color: var(--custom-pink-light) !important; }
+        .bg-custom-teal-light { background-color: var(--custom-teal-light) !important; }
+        .text-custom-pink { color: var(--bs-pink) !important; }
+        .text-custom-teal { color: var(--bs-teal) !important; }
+        .border-custom-pink { border-color: var(--bs-pink) !important; }
+
+        /* Adapt action buttons */
+        .action-button {
+            background: rgba(255, 255, 255, 0.7);
+            border-radius: 50%;
+            padding: 0.25rem; /* Use rem */
+            margin-left: 5px;
+            transition: background 0.2s ease;
+            line-height: 1; /* Prevent extra space */
+            border: none;
+        }
+        .action-button:hover { background: rgba(255, 255, 255, 0.9); }
+        .action-button svg, .action-button i { width: 16px; height: 16px; vertical-align: middle; } /* Align icons */
+
+        [data-bs-theme="dark"] .action-button { background: rgba(45, 55, 72, 0.7); }
+        [data-bs-theme="dark"] .action-button:hover { background: rgba(45, 55, 72, 0.9); }
+
+        /* Gallery favorite button style */
+        .favorite-btn.favorited i {
+            font-weight: bold; /* Make filled heart bold */
+            color: var(--bs-pink);
+        }
+        .favorite-btn:not(.favorited) i {
+             color: var(--bs-pink); /* Keep outline pink */
+        }
+
+         /* Ensure gallery image fits container */
+        .gallery-item img {
+             width: 100%;
+             height: 100%;
+             object-fit: cover;
+             cursor: pointer;
+         }
+         .gallery-item {
+             position: relative;
+             aspect-ratio: 1 / 1; /* Maintain square aspect ratio */
+             overflow: hidden; /* Needed for aspect-ratio */
+         }
+        .gallery-overlay {
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(to top, rgba(0,0,0,0.7), rgba(0,0,0,0.1), transparent);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
+            padding: 0.75rem; /* p-3 */
+        }
+        .gallery-item:hover .gallery-overlay { opacity: 1; }
+
+        .gallery-actions {
+            position: absolute;
+            top: 0.5rem; /* top-2 */
+            right: 0.5rem; /* right-2 */
+            display: flex;
+            gap: 0.25rem; /* space-x-1 */
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+         .gallery-item:hover .gallery-actions { opacity: 1; }
+
+         /* Modal Input background for dark theme */
+        [data-bs-theme="dark"] .modal-input,
+        [data-bs-theme="dark"] .login-input { /* Apply to login inputs too */
+             background-color: #4a5568; /* Match dark input backgrounds */
+             border-color: var(--bs-border-color);
+             color: var(--bs-body-color);
+        }
+         [data-bs-theme="dark"] .modal-input::placeholder,
+         [data-bs-theme="dark"] .login-input::placeholder { /* Apply to login inputs too */
+             color: #a0aec0;
+         }
+         [data-bs-theme="dark"] .modal-input:focus,
+         [data-bs-theme="dark"] .login-input:focus { /* Apply to login inputs too */
+             border-color: var(--bs-pink);
+             box-shadow: 0 0 0 0.25rem rgba(var(--bs-primary-rgb), 0.25);
+         }
+
+         /* Make Notes scrollable */
+         #notes-container {
+            max-height: 24rem; /* max-h-96 */
+            overflow-y: auto;
+            padding-right: 0.5rem; /* pr-2 */
+         }
+
+         /* Adjust particles z-index relative to Bootstrap fixed navbar */
+         nav.fixed-top { z-index: 1030; }
+         /* #particles-js is already z-index: -1 */
+
+         /* Style for active filter button */
+         .filter-btn-active {
+             background-color: var(--bs-primary) !important;
+             color: white !important;
+             border-color: var(--bs-primary) !important;
+         }
+
+         /* Hover effect helper */
+         .group:hover .group-hover-opacity-100 { opacity: 1 !important; }
+         .group .group-hover-opacity-100 { opacity: 0; }
+         .group .transition-opacity { transition: opacity 0.3s ease-in-out; }
+
+    </style>
+</head>
+<body> <div id="particles-js"></div>
+
+    <div id="login-page">
+        <div class="card shadow-lg border-0 rounded-4 login-card">
+            <div class="card-body p-4 p-md-5">
+                <h1 class="script-font fs-2 fw-bold text-custom-pink text-center mb-4">Our<span class="text-custom-teal">Story</span></h1>
+                <p class="text-center text-muted mb-4">Please log in to continue</p>
+                <form id="login-form">
+                    <div class="mb-3">
+                        <label for="login-email" class="form-label">Email</label>
+                        <input type="email" class="form-control login-input" id="login-email" required placeholder="Enter your email">
+                    </div>
+                    <div class="mb-3">
+                        <label for="login-password" class="form-label">Password</label>
+                        <input type="password" class="form-control login-input" id="login-password" required placeholder="Enter your password">
+                    </div>
+                    <div id="login-error" class="text-danger small mb-3" style="display: none;"></div>
+                    <div class="d-grid">
+                        <button type="submit" class="btn btn-primary rounded-pill shadow px-5 py-2">Log In</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div id="dashboard-content" class="d-flex flex-column min-vh-100">
+
+        <nav class="navbar navbar-expand-md bg-body-tertiary shadow-sm fixed-top py-3">
+            <div class="container">
+                <a class="navbar-brand script-font fs-4 fw-bold text-custom-pink" href="#">Our<span class="text-custom-teal">Story</span></a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse" id="navbarNav">
+                    <ul class="navbar-nav mx-auto mb-2 mb-md-0">
+                        <li class="nav-item"><a href="#dashboard" class="nav-link px-3">Dashboard</a></li>
+                        <li class="nav-item"><a href="#memories" class="nav-link px-3">Memories</a></li>
+                        <li class="nav-item"><a href="#gallery" class="nav-link px-3">Gallery</a></li>
+                        <li class="nav-item"><a href="#map" class="nav-link px-3">Love Map</a></li>
+                        <li class="nav-item"><a href="#notes" class="nav-link px-3">Notes</a></li>
+                    </ul>
+                    <div class="d-flex align-items-center gap-2">
+                         <button id="settings-btn" class="btn btn-outline-secondary rounded-circle p-2 lh-1" title="Settings">
+                             <i class="bi bi-gear-fill fs-5"></i>
+                         </button>
+                         <button id="voice-btn" class="btn rounded-circle p-2 lh-1 bg-custom-pink-light text-custom-pink" title="Voice Commands (Placeholder)">
+                             <i class="bi bi-mic-fill fs-5"></i>
+                         </button>
+                        <button id="theme-toggle" class="btn rounded-circle p-2 lh-1 bg-custom-teal-light text-custom-teal" title="Toggle Theme">
+                            <i class="bi bi-moon-stars-fill fs-5"></i>
+                        </button>
+                        <button id="logout-btn" class="btn btn-outline-danger rounded-circle p-2 lh-1" title="Logout">
+                             <i class="bi bi-box-arrow-right fs-5"></i>
+                         </button>
+                    </div>
+                </div>
+            </div>
+        </nav>
+
+        <main class="container mt-5 pt-5 pb-4 flex-grow-1">
+            <section class="position-relative rounded-4 overflow-hidden mb-5" style="height: 24rem;">
+                <div class="position-absolute top-0 start-0 w-100 h-100" style="background: linear-gradient(to bottom right, #ffdde1, #fce7f3, #ccfbf1); opacity: 0.6;"></div>
+                <div class="position-absolute top-0 start-0 w-100 h-100 d-flex flex-column justify-content-center align-items-center text-center p-4">
+                    <h2 id="greeting" class="display-4 fw-bold text-custom-pink mb-3 script-font">Loading...</h2>
+                    <p id="date-time" class="fs-5 text-custom-teal fw-medium"></p>
+                    <div class="mt-4 bg-body bg-opacity-75 px-4 py-2 rounded-pill shadow-sm">
+                        <p class="text-body-secondary fst-italic mb-0">"Every love story is beautiful, but ours is my favorite."</p>
+                    </div>
+                </div>
+            </section>
+
+            <section id="dashboard" class="my-5 py-4">
+                <h2 class="display-5 fw-bold text-custom-pink mb-5 script-font text-center">Our Journey Together</h2>
+                <div id="dashboard-grid" class="row g-4">
+                    <div class="col-md-6 col-lg-3">
+                        <div class="card text-center p-4 floating h-100">
+                            <div class="mb-3">
+                                <span class="d-inline-flex align-items-center justify-content-center rounded-circle bg-custom-pink-light text-custom-pink" style="width: 4rem; height: 4rem;">
+                                    <i class="bi bi-calendar-heart fs-2"></i>
+                                </span>
+                            </div>
+                            <h3 class="fs-5 fw-semibold mb-1">Days Together</h3>
+                            <div class="counter-value display-3 fw-bold text-custom-pink" id="days-count">0</div>
+                            <p class="text-muted mt-1 mb-0">days of loving each other</p>
+                        </div>
+                    </div>
+                     <div class="col-md-6 col-lg-3">
+                        <div class="card text-center p-4 floating h-100">
+                            <div class="mb-3">
+                                <span class="d-inline-flex align-items-center justify-content-center rounded-circle bg-custom-teal-light text-custom-teal" style="width: 4rem; height: 4rem;">
+                                    <i class="bi bi-clock-history fs-2"></i>
+                                </span>
+                            </div>
+                            <h3 class="fs-5 fw-semibold mb-1">Next Anniversary</h3>
+                            <div id="next-anniversary" class="fs-3 fw-bold text-custom-teal">Loading...</div>
+                            <p class="text-muted mt-1 mb-0">until we celebrate again</p>
+                        </div>
+                    </div>
+                    <div class="col-md-6 col-lg-3">
+                        <div class="card text-center p-4 floating h-100">
+                            <div class="mb-3">
+                                 <span class="d-inline-flex align-items-center justify-content-center rounded-circle bg-custom-pink-light text-custom-pink" style="width: 4rem; height: 4rem;">
+                                    <i class="bi bi-balloon-heart-fill fs-2"></i>
+                                </span>
+                            </div>
+                            <h3 class="fs-5 fw-semibold mb-1">Special Moments</h3>
+                            <div class="counter-value display-3 fw-bold text-custom-pink" id="moments-count">0</div>
+                            <p class="text-muted mt-1 mb-0">memories & photos</p>
+                        </div>
+                    </div>
+                    <div class="col-md-6 col-lg-3">
+                         <div class="card text-center p-4 floating h-100 d-flex flex-column">
+                            <div class="mb-3">
+                                 <span class="d-inline-flex align-items-center justify-content-center rounded-circle bg-custom-teal-light text-custom-teal" style="width: 4rem; height: 4rem;">
+                                    <i class="bi bi-calendar-event fs-2"></i>
+                                </span>
+                            </div>
+                            <h3 class="fs-5 fw-semibold mb-1">Upcoming Event</h3>
+                            <div id="next-event-name" class="fs-6 fw-bold text-custom-teal text-center">Add an Event</div>
+                            <div id="next-event-date" class="text-muted mt-1 text-center">--</div>
+                            <div class="mt-auto pt-2">
+                                <button id="add-event-btn" class="btn btn-link text-custom-teal text-decoration-none p-0">Manage Events</button>
+                            </div>
+                         </div>
+                    </div>
+                </div>
+                 <div id="celebration-info" class="mt-4 text-center"></div>
+             </section>
+
+            <section id="memories" class="my-5 py-4">
+                <h2 class="display-5 fw-bold text-custom-pink mb-5 script-font text-center">Our Precious Memories</h2>
+                <div class="card shadow-sm">
+                    <div class="card-body p-4">
+                        <div id="memories-grid" class="row g-4">
+                            <p id="memories-placeholder" class="text-muted col-12 text-center py-5">Add your first memory!</p>
+                            </div>
+                        <div class="text-center mt-4">
+                            <button id="add-memory" class="btn btn-primary btn-lg rounded-pill shadow px-5 py-2">Add New Memory</button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section id="gallery" class="my-5 py-4">
+                <h2 class="display-5 fw-bold text-custom-pink mb-5 script-font text-center">Our Photo Gallery</h2>
+                <div class="card shadow-sm">
+                     <div class="card-body p-4">
+                        <div class="mb-4 p-4 border border-2 border-dashed border-custom-pink rounded-3 text-center bg-custom-pink-light" id="drop-zone">
+                            <div class="mb-3">
+                                <i class="bi bi-images fs-1 text-custom-pink"></i>
+                            </div>
+                            <h3 class="fs-5 fw-semibold mb-2 text-custom-teal">Upload Your Special Moments</h3>
+                            <p class="text-muted mb-3">Drag and drop photos or click to select. <strong class="text-danger">Warning: Large photos might not save correctly due to browser limits!</strong></p>
+                            <input type="file" id="image-upload" class="d-none" accept="image/*" multiple>
+                            <button id="upload-btn" class="btn btn-primary rounded-pill shadow px-4 py-2">Choose Photos</button>
+                        </div>
+
+                        <div class="d-flex flex-wrap justify-content-between align-items-center mb-4 gap-3">
+                            <div class="btn-group flex-wrap gap-1" role="group" aria-label="Gallery Filters" id="gallery-filter-buttons">
+                                 <button type="button" data-filter="all" class="btn btn-sm btn-outline-primary filter-btn-active">All Photos</button>
+                                 <button type="button" data-filter="favorites" class="btn btn-sm btn-outline-primary">Favorites</button>
+                                 <button type="button" data-filter="dates" class="btn btn-sm btn-outline-primary">Dates</button>
+                                 <button type="button" data-filter="trips" class="btn btn-sm btn-outline-primary">Trips</button>
+                                 <button type="button" data-filter="events" class="btn btn-sm btn-outline-primary">Events</button>
+                                 <button type="button" data-filter="other" class="btn btn-sm btn-outline-primary">Other</button>
+                            </div>
+                            <div class="d-flex align-items-center">
+                                <label for="gallery-sort" class="text-muted me-2 small">Sort by:</label>
+                                <select id="gallery-sort" class="form-select form-select-sm w-auto">
+                                    <option value="newest">Newest First</option>
+                                    <option value="oldest">Oldest First</option>
+                                    <option value="title_az">Title A-Z</option>
+                                     <option value="title_za">Title Z-A</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div id="gallery-grid" class="row g-3">
+                            <p id="gallery-placeholder" class="text-muted col-12 text-center py-5">Upload your first photo!</p>
+                            </div>
+                    </div>
+                </div>
+            </section>
+
+            <section id="map" class="my-5 py-4">
+                <h2 class="display-5 fw-bold text-custom-pink mb-5 script-font text-center">Our Love Map</h2>
+                <div class="card shadow-sm">
+                    <div class="card-body p-4">
+                        <div id="love-map" class="w-100 rounded-3 position-relative bg-custom-teal-light" style="height: 24rem;">
+                            <div class="position-absolute top-0 start-0 w-100 h-100 d-flex flex-column align-items-center justify-content-center text-center p-3">
+                                 <div class="display-1 mb-3">🗺️</div>
+                                 <p class="fs-5 text-custom-teal fw-semibold">Map Your Adventures</p>
+                                 <p class="small text-muted mt-2">(Map implementation requires external libraries/APIs - currently a placeholder)</p>
+                                  <p class="text-body-tertiary small mt-3">Future ideas: Add pins for places visited, link to memories or photos.</p>
+                             </div>
+                        </div>
+                        <div class="row g-3 mt-4">
+                            <div class="col-md-4">
+                                 <div class="card bg-custom-pink-light p-3">
+                                    <div class="d-flex align-items-center">
+                                        <span class="d-inline-block rounded-circle me-2" style="width: 0.75rem; height: 0.75rem; background-color: var(--bs-pink);"></span>
+                                        <span>Paris, France</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="card bg-custom-teal-light p-3">
+                                    <div class="d-flex align-items-center">
+                                        <span class="d-inline-block rounded-circle me-2" style="width: 0.75rem; height: 0.75rem; background-color: var(--bs-teal);"></span>
+                                        <span>Tokyo, Japan</span>
+                                    </div>
+                                </div>
+                            </div>
+                             <div class="col-md-4">
+                                 <div class="card bg-custom-pink-light p-3">
+                                    <div class="d-flex align-items-center">
+                                         <span class="d-inline-block rounded-circle me-2" style="width: 0.75rem; height: 0.75rem; background-color: var(--bs-pink);"></span>
+                                        <span>New York, USA</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section id="notes" class="my-5 py-4">
+                <h2 class="display-5 fw-bold text-custom-pink mb-5 script-font text-center">Love Notes</h2>
+                <div class="row g-4">
+                    <div class="col-md-6">
+                        <div class="card shadow-sm h-100">
+                             <div class="card-body p-4">
+                                <h3 class="fs-5 fw-semibold mb-4 text-center text-custom-teal">Write a Love Note</h3>
+                                <form id="add-note-form">
+                                    <div class="vstack gap-3">
+                                        <input type="text" id="note-title" placeholder="Title" required class="form-control bg-custom-pink-light border-custom-pink modal-input">
+                                        <textarea id="note-content" rows="5" placeholder="Write your thoughts..." required class="form-control bg-custom-pink-light border-custom-pink modal-input"></textarea>
+                                        <div class="text-end">
+                                            <button type="submit" id="save-note-btn" class="btn btn-success rounded-pill shadow px-4">Save Note</button>
+                                        </div>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="card shadow-sm h-100">
+                             <div class="card-body p-4 d-flex flex-column">
+                                <h3 class="fs-5 fw-semibold mb-4 text-center text-custom-pink">Saved Notes</h3>
+                                 <div id="notes-container" class="vstack gap-3 flex-grow-1">
+                                    <p id="notes-placeholder" class="text-muted text-center py-5">Add your first note!</p>
+                                    </div>
+                             </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+        </main>
+
+        <footer class="bg-body-tertiary shadow-sm text-center p-4 mt-auto">
+            <p class="text-muted mb-1">Developer<span class="text-custom-pink"> John Carlo Galindez</span> | <span id="current-year"></span></p>
+             <p class="small text-body-secondary mt-1 mb-0">Data is stored locally in your browser via localStorage.</p>
+         </footer>
+
+    </div> <div class="modal fade" id="generic-modal" tabindex="-1" aria-labelledby="modal-title" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content shadow border-0 rounded-3">
+                <div class="modal-header border-bottom-0">
+                     <h1 class="modal-title fs-5 fw-bold text-custom-pink w-100 text-center" id="modal-title">Modal Title</h1>
+                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                 </div>
+                <form id="modal-form">
+                    <input type="hidden" id="edit-id">
+                    <div class="modal-body py-4 px-4">
+                        <div id="modal-body" class="vstack gap-3">
+                             </div>
+                     </div>
+                    <div class="modal-footer flex-nowrap justify-content-end border-top-0 px-4 pb-4 pt-0">
+                        <button type="button" class="btn btn-outline-secondary rounded-pill px-4" data-bs-dismiss="modal">Cancel</button>
+                         <button type="submit" id="modal-save-btn" class="btn btn-primary rounded-pill shadow px-4">Save</button>
+                     </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+     <div class="modal fade modal-xl" id="image-viewer-modal" tabindex="-1" aria-labelledby="image-viewer-title" aria-hidden="true">
+         <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+             <div class="modal-content bg-dark bg-opacity-75 text-white border-0">
+                <div class="modal-header border-0 position-absolute top-0 end-0 z-1">
+                    <button id="close-viewer" type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                 </div>
+                 <div class="modal-body p-2">
+                    <div class="d-flex align-items-center justify-content-center">
+                        <button id="prev-image" class="btn btn-link text-white text-opacity-75 hover-text-opacity-100 p-2 mx-2">
+                            <i class="bi bi-chevron-left fs-2"></i>
+                        </button>
+                        <div class="image-container position-relative rounded-2 overflow-hidden" style="max-width: 80vw;">
+                             <img id="current-image" src="" alt="Image Preview" class="img-fluid d-block mx-auto" style="max-height: 80vh; object-fit: contain;">
+                            <div class="position-absolute bottom-0 start-0 end-0 p-3" style="background: linear-gradient(to top, rgba(0,0,0,0.8), transparent);">
+                                <h3 id="image-title" class="fs-5 fw-semibold mb-1">Image Title</h3>
+                                <p id="image-description" class="small mb-1">Image description or details</p>
+                                <p id="image-date" class="small text-white-50 mb-0">Date taken</p>
+                            </div>
+                             <button id="edit-photo-details-btn" class="action-button position-absolute top-0 start-0 m-2" title="Edit Details">
+                                <i class="bi bi-pencil-square text-white"></i>
+                            </button>
+                        </div>
+                        <button id="next-image" class="btn btn-link text-white text-opacity-75 hover-text-opacity-100 p-2 mx-2">
+                            <i class="bi bi-chevron-right fs-2"></i>
+                        </button>
+                    </div>
+                 </div>
+             </div>
+         </div>
+    </div>
+
+    <div id="loading-indicator" class="position-fixed top-0 start-0 w-100 vh-100 d-none align-items-center justify-content-center" style="background-color: rgba(255, 255, 255, 0.75); z-index: 9999;">
+        <div class="spinner-border text-custom-pink" role="status" style="width: 3rem; height: 3rem;">
+            <span class="visually-hidden">Loading...</span>
+        </div>
+    </div>
+
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+
+    <script>
+        // ---- Hardcoded Credentials (INSECURE - FOR DEMO ONLY) ----
+        const VALID_EMAIL = 'admin@1101';
+        const VALID_PASS = 'bbgrace';
+
+        // ---- Application State & Configuration ----
+        const APP_STORAGE_KEY = 'relationshipDashboardData_v1_bs';
+        const LOGIN_STATE_KEY = 'relationshipDashboardLoggedIn'; // sessionStorage key
+        const defaultAppData = {
+             settings: { user1Name: "Partner 1", user2Name: "Partner 2", startDate: "", theme: 'light' },
+             memories: [], photos: [], notes: [], events: [],
+        };
+        let appData = {};
+        let currentEditingId = null;
+        let currentPhotoIndex = 0;
+        let filteredPhotos = [];
+        let dashboardInitialized = false; // Flag to prevent multiple initializations
+
+        // ---- DOM Element References ----
+        // Login Elements
+        let loginPage, dashboardContent, loginForm, loginEmailInput, loginPasswordInput, loginErrorMsg;
+        // Dashboard Elements (initialized later)
+        let greetingEl, dateTimeEl, daysCountEl, nextAnniversaryEl, momentsCountEl, nextEventNameEl, nextEventDateEl;
+        let memoriesGridEl, memoriesPlaceholderEl;
+        let galleryGridEl, galleryPlaceholderEl, galleryFilterButtonsEl, gallerySortEl;
+        let notesContainerEl, notesPlaceholderEl;
+        let addNoteFormEl, noteTitleInputEl, noteContentInputEl;
+        let themeToggleBtn, settingsBtn, logoutBtn; // Added logoutBtn
+        let genericModalEl, modalTitleEl, modalFormEl, modalBodyEl, modalSaveBtn, editIdInput;
+        let imageViewerModalEl, closeViewerBtn, currentImageEl, imageTitleEl, imageDescriptionEl, imageDateEl, prevImageBtn, nextImageBtn, editPhotoDetailsBtn;
+        let uploadBtn, imageUploadInput, dropZoneEl;
+        let dashboardGridEl, celebrationInfoEl;
+        let loadingIndicatorEl;
+        let bsGenericModal, bsImageViewerModal; // Bootstrap Modal Instances
+
+        // ---- Initialization ----
+        document.addEventListener('DOMContentLoaded', () => {
+            console.log("DOM Content Loaded. Checking login state...");
+            getLoginDOMReferences(); // Get login elements first
+            checkLoginState(); // Check if already logged in via sessionStorage
+            setupLoginListener(); // Set up the login form listener
+        });
+
+        function getLoginDOMReferences() {
+            loginPage = document.getElementById('login-page');
+            dashboardContent = document.getElementById('dashboard-content');
+            loginForm = document.getElementById('login-form');
+            loginEmailInput = document.getElementById('login-email');
+            loginPasswordInput = document.getElementById('login-password');
+            loginErrorMsg = document.getElementById('login-error');
+
+             if (!loginPage || !dashboardContent || !loginForm || !loginEmailInput || !loginPasswordInput || !loginErrorMsg) {
+                 console.error("CRITICAL ERROR: Login page elements not found. Check IDs.");
+                 alert("Error initializing the page. Missing login elements. Check console.");
+                 // Prevent further execution if login elements are missing
+                 throw new Error("Missing critical login elements.");
+             }
+        }
+
+        function checkLoginState() {
+            const isLoggedIn = sessionStorage.getItem(LOGIN_STATE_KEY);
+            if (isLoggedIn === 'true') {
+                console.log("User already logged in (session). Initializing dashboard...");
+                showDashboard();
+                // Only call initApp if it hasn't been called yet
+                if (!dashboardInitialized) {
+                    initApp();
+                }
+            } else {
+                console.log("User not logged in. Displaying login page.");
+                showLoginPage();
+            }
+        }
+
+        function showLoginPage() {
+            loginPage.style.display = 'flex'; // Or 'block' depending on your layout
+            dashboardContent.style.display = 'none';
+            if (window.particlesJS) initParticles(document.documentElement.getAttribute('data-bs-theme') === 'dark'); // Init particles for login page
+        }
+
+        function showDashboard() {
+            loginPage.style.display = 'none';
+            dashboardContent.style.display = 'flex'; // Restore display (flex column)
+             // Particles will be re-initialized by initApp if needed
+        }
+
+        function setupLoginListener() {
+            loginForm.addEventListener('submit', handleLogin);
+        }
+
+        function handleLogin(event) {
+            event.preventDefault();
+            console.log("Login attempt...");
+            const email = loginEmailInput.value.trim();
+            const password = loginPasswordInput.value; // Don't trim password
+
+            if (email === VALID_EMAIL && password === VALID_PASS) {
+                console.log("Login successful!");
+                loginErrorMsg.style.display = 'none';
+                sessionStorage.setItem(LOGIN_STATE_KEY, 'true'); // Set session flag
+                showDashboard();
+                 // Only call initApp if it hasn't been called yet
+                 if (!dashboardInitialized) {
+                     initApp();
+                 }
+            } else {
+                console.log("Login failed: Invalid credentials.");
+                loginErrorMsg.textContent = "Invalid email or password.";
+                loginErrorMsg.style.display = 'block';
+                loginPasswordInput.value = ''; // Clear password field
+            }
+        }
+
+        function handleLogout() {
+            console.log("Logging out...");
+            sessionStorage.removeItem(LOGIN_STATE_KEY); // Clear session flag
+            appData = {}; // Clear potentially loaded data (optional, helps ensure clean state)
+            dashboardInitialized = false; // Reset init flag
+            loginPasswordInput.value = ''; // Clear password field on login page
+            loginEmailInput.value = ''; // Clear email field on login page
+            loginErrorMsg.style.display = 'none'; // Hide any errors
+            showLoginPage();
+            // Optional: reload page for a completely clean slate
+            // location.reload();
+        }
+
+
+        // ---- Dashboard Application Initialization (Called *after* login) ----
+        function initApp() {
+            if (dashboardInitialized) {
+                console.warn("Attempted to initialize dashboard again. Skipping.");
+                return;
+            }
+            console.log("Initializing Dashboard App...");
+            dashboardInitialized = true; // Set flag
+
+            getDashboardDOMReferences(); // Get references for dashboard elements
+
+            // Initialize Bootstrap Modals
+            if (genericModalEl) bsGenericModal = new bootstrap.Modal(genericModalEl);
+            if (imageViewerModalEl) bsImageViewerModal = new bootstrap.Modal(imageViewerModalEl);
+
+            loadData();
+            initUI();
+            updateDashboardCounters();
+            updateCelebrationInfo();
+            renderMemories();
+            renderGallery();
+            renderNotes();
+            setupDashboardEventListeners(); // Set up listeners for dashboard elements
+            initParticles(appData.settings.theme === 'dark'); // Init particles for dashboard
+            animateCounters();
+            hideLoading(); // Hide loading indicator if it was shown
+             console.log("Dashboard App Initialized.");
+        }
+
+         function getDashboardDOMReferences() {
+             // Get all dashboard-related elements here...
+             greetingEl = document.getElementById('greeting');
+             dateTimeEl = document.getElementById('date-time');
+             daysCountEl = document.getElementById('days-count');
+             nextAnniversaryEl = document.getElementById('next-anniversary');
+             momentsCountEl = document.getElementById('moments-count');
+             nextEventNameEl = document.getElementById('next-event-name');
+             nextEventDateEl = document.getElementById('next-event-date');
+             dashboardGridEl = document.getElementById('dashboard-grid');
+             celebrationInfoEl = document.getElementById('celebration-info');
+
+             memoriesGridEl = document.getElementById('memories-grid');
+             memoriesPlaceholderEl = document.getElementById('memories-placeholder');
+
+             galleryGridEl = document.getElementById('gallery-grid');
+             galleryPlaceholderEl = document.getElementById('gallery-placeholder');
+             galleryFilterButtonsEl = document.getElementById('gallery-filter-buttons');
+             gallerySortEl = document.getElementById('gallery-sort');
+
+             notesContainerEl = document.getElementById('notes-container');
+             notesPlaceholderEl = document.getElementById('notes-placeholder');
+             addNoteFormEl = document.getElementById('add-note-form');
+             noteTitleInputEl = document.getElementById('note-title');
+             noteContentInputEl = document.getElementById('note-content');
+
+             themeToggleBtn = document.getElementById('theme-toggle');
+             settingsBtn = document.getElementById('settings-btn');
+             logoutBtn = document.getElementById('logout-btn'); // Get logout button
+
+             // Modal Elements
+             genericModalEl = document.getElementById('generic-modal');
+             modalTitleEl = document.getElementById('modal-title');
+             modalFormEl = document.getElementById('modal-form');
+             modalBodyEl = document.getElementById('modal-body');
+             modalSaveBtn = document.getElementById('modal-save-btn');
+             editIdInput = document.getElementById('edit-id');
+
+             imageViewerModalEl = document.getElementById('image-viewer-modal');
+             closeViewerBtn = document.getElementById('close-viewer');
+             currentImageEl = document.getElementById('current-image');
+             imageTitleEl = document.getElementById('image-title');
+             imageDescriptionEl = document.getElementById('image-description');
+             imageDateEl = document.getElementById('image-date');
+             prevImageBtn = document.getElementById('prev-image');
+             nextImageBtn = document.getElementById('next-image');
+             editPhotoDetailsBtn = document.getElementById('edit-photo-details-btn');
+
+             uploadBtn = document.getElementById('upload-btn');
+             imageUploadInput = document.getElementById('image-upload');
+             dropZoneEl = document.getElementById('drop-zone');
+
+             loadingIndicatorEl = document.getElementById('loading-indicator');
+
+             // CRITICAL CHECK for dashboard elements
+             const refs = { greetingEl, dateTimeEl, daysCountEl, nextAnniversaryEl, momentsCountEl, nextEventNameEl, nextEventDateEl, dashboardGridEl, celebrationInfoEl, memoriesGridEl, memoriesPlaceholderEl, galleryGridEl, galleryPlaceholderEl, galleryFilterButtonsEl, gallerySortEl, notesContainerEl, notesPlaceholderEl, addNoteFormEl, noteTitleInputEl, noteContentInputEl, themeToggleBtn, settingsBtn, logoutBtn, genericModalEl, modalTitleEl, modalFormEl, modalBodyEl, modalSaveBtn, editIdInput, imageViewerModalEl, currentImageEl, imageTitleEl, imageDescriptionEl, imageDateEl, prevImageBtn, nextImageBtn, editPhotoDetailsBtn, uploadBtn, imageUploadInput, dropZoneEl, loadingIndicatorEl };
+             const missing = Object.entries(refs).filter(([key, value]) => !value);
+             if (missing.length > 0) {
+                 const missingKeys = missing.map(([key]) => key).join(', ');
+                 console.error(`CRITICAL ERROR: DASHBOARD elements not found: ${missingKeys}. Check IDs.`);
+                 alert(`Error initializing the dashboard. Missing elements: ${missingKeys}. Check console.`);
+                 throw new Error("Missing critical dashboard elements.");
+             }
+         }
+
+        // ---- Data Management ----
+        // loadData, saveData, deepMerge functions remain unchanged.
+        function loadData() {
+             console.log("Loading data from localStorage...");
+             try {
+                 const storedData = localStorage.getItem(APP_STORAGE_KEY);
+                 if (storedData) {
+                     const parsedData = JSON.parse(storedData);
+                     // Deep merge defaults with loaded data to handle potential missing keys after updates
+                     appData = deepMerge(JSON.parse(JSON.stringify(defaultAppData)), parsedData);
+                     console.log("Data loaded successfully:", appData);
+                 } else {
+                     appData = JSON.parse(JSON.stringify(defaultAppData));
+                     console.log("No stored data found, using defaults.");
+                     // Optionally save defaults immediately if you want them persisted on first load
+                     // saveData();
+                 }
+             } catch (error) {
+                 console.error("Error loading or parsing data from localStorage:", error);
+                 appData = JSON.parse(JSON.stringify(defaultAppData)); // Fallback to defaults
+                 alert("Could not load saved data. Using default settings.");
+             }
+             // Ensure top-level arrays/objects exist even if loading failed or data was minimal
+             appData.settings = appData.settings || defaultAppData.settings;
+             appData.memories = appData.memories || [];
+             appData.photos = appData.photos || [];
+             appData.notes = appData.notes || [];
+             appData.events = appData.events || [];
+         }
+         function saveData() {
+             try {
+                 localStorage.setItem(APP_STORAGE_KEY, JSON.stringify(appData));
+             } catch (error) {
+                 console.error("Error saving data to localStorage:", error);
+                 if (error.name === 'QuotaExceededError') {
+                     alert("Could not save data. Browser storage might be full. Try deleting some large photos.");
+                 } else {
+                     alert("An error occurred while saving data.");
+                 }
+             }
+         }
+         function deepMerge(target, source) {
+             for (const key in source) {
+                 if (Object.prototype.hasOwnProperty.call(source, key)) {
+                     const targetValue = target[key];
+                     const sourceValue = source[key];
+
+                     // Ensure we don't merge null/undefined source values over existing target values unnecessarily,
+                     // unless the target also doesn't have the key.
+                     if (sourceValue === null || sourceValue === undefined) {
+                         if (!Object.prototype.hasOwnProperty.call(target, key)) {
+                             target[key] = sourceValue;
+                         }
+                         continue; // Skip null/undefined source values if target already has the key
+                     }
+
+                     if (typeof sourceValue === 'object' && !Array.isArray(sourceValue) &&
+                         targetValue && typeof targetValue === 'object' && !Array.isArray(targetValue)) {
+                         // Recurse for nested objects
+                         deepMerge(targetValue, sourceValue);
+                     } else if (Array.isArray(sourceValue) && Array.isArray(targetValue)) {
+                         // Handle arrays: simple overwrite or more complex merge?
+                         // For this app, overwriting array content from source seems reasonable.
+                         // If merging items by ID were needed, it would be more complex.
+                         target[key] = [...sourceValue]; // Clone source array
+                     } else {
+                         // Overwrite primitive values or assign new keys
+                         target[key] = sourceValue;
+                     }
+                 }
+             }
+             // Ensure default keys missing in source are kept in target
+             for (const key in target) {
+                if (Object.prototype.hasOwnProperty.call(target, key) && !Object.prototype.hasOwnProperty.call(source, key)) {
+                    // Keep the target's default value if source doesn't provide it
+                }
+             }
+             return target;
+         }
+
+
+        // ---- UI Initialization & Updates (Dashboard) ----
+        function initUI() {
+            setTheme(appData.settings.theme || 'light'); // Apply initial theme
+            updateGreeting();
+            updateDateTime();
+            setInterval(updateDateTime, 1000); // Update time every second
+            const currentYearEl = document.getElementById('current-year');
+            if (currentYearEl) currentYearEl.textContent = new Date().getFullYear();
+        }
+
+        function setTheme(theme) {
+             const htmlElement = document.documentElement;
+             const themeIcon = themeToggleBtn?.querySelector('i'); // Use optional chaining
+
+             if (theme === 'dark') {
+                 htmlElement.setAttribute('data-bs-theme', 'dark');
+                 if (themeIcon) themeIcon.className = 'bi bi-sun-fill fs-5';
+                 if (themeToggleBtn) themeToggleBtn.title = "Switch to Light Mode";
+             } else {
+                 htmlElement.setAttribute('data-bs-theme', 'light');
+                 if (themeIcon) themeIcon.className = 'bi bi-moon-stars-fill fs-5';
+                 if (themeToggleBtn) themeToggleBtn.title = "Switch to Dark Mode";
+             }
+             appData.settings.theme = theme;
+             // Re-initialize particles with the correct theme colors if dashboard is visible
+              if (dashboardContent.style.display !== 'none' && window.particlesJS) {
+                 initParticles(theme === 'dark');
+             }
+         }
+
+        function updateGreeting() {
+            if (!greetingEl) return;
+            const name1 = appData.settings.user1Name || "Partner 1";
+            const name2 = appData.settings.user2Name || "Partner 2";
+            greetingEl.textContent = `${escapeHTML(name1)} & ${escapeHTML(name2)}`;
+        }
+        function updateDateTime() {
+            if (!dateTimeEl) return;
+            const now = new Date();
+            const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' };
+            dateTimeEl.textContent = now.toLocaleDateString(undefined, options);
+        }
+        function updateDashboardCounters() {
+            if (!daysCountEl || !nextAnniversaryEl || !momentsCountEl || !nextEventNameEl || !nextEventDateEl) return;
+
+            const startDateStr = appData.settings.startDate;
+            let daysTogether = 0;
+            let nextAnniversaryText = "Set Start Date";
+            let nextEventText = "Add an Event";
+            let nextEventDateText = "--";
+
+            if (startDateStr) {
+                 try {
+                    // Ensure correct parsing regardless of local timezone issues with just YYYY-MM-DD
+                    const parts = startDateStr.split('-');
+                    const startDate = new Date(Date.UTC(parts[0], parts[1] - 1, parts[2])); // Use UTC to avoid TZ offset issues
+
+                    if (!isNaN(startDate.getTime())) {
+                         const today = new Date();
+                         const todayUTC = new Date(Date.UTC(today.getFullYear(), today.getMonth(), today.getDate())); // Today at UTC midnight
+
+                         if (todayUTC >= startDate) {
+                             const diffTime = todayUTC - startDate;
+                             daysTogether = Math.floor(diffTime / (1000 * 60 * 60 * 24)) + 1; // +1 to include start day
+                         } else {
+                             daysTogether = 0; // Start date is in the future
+                         }
+
+                         // Anniversary Calculation (relative to todayUTC)
+                         let nextAnniversaryDate = new Date(Date.UTC(todayUTC.getUTCFullYear(), startDate.getUTCMonth(), startDate.getUTCDate()));
+
+                         if (nextAnniversaryDate < todayUTC) { // If this year's anniversary has passed
+                             nextAnniversaryDate.setUTCFullYear(todayUTC.getUTCFullYear() + 1);
+                         }
+
+                         const anniDiffTime = nextAnniversaryDate - todayUTC;
+                         const daysUntilAnniversary = Math.ceil(anniDiffTime / (1000 * 60 * 60 * 24));
+
+                         if (daysUntilAnniversary === 0) { // Anniversary is today
+                             nextAnniversaryText = "Happy Anniversary!";
+                         } else if (daysUntilAnniversary === 1) {
+                             nextAnniversaryText = "Tomorrow!";
+                         } else if (daysUntilAnniversary <= 7) {
+                             nextAnniversaryText = `${daysUntilAnniversary} days`;
+                         } else if (daysUntilAnniversary <= 31) {
+                             nextAnniversaryText = `${Math.round(daysUntilAnniversary / 7)} weeks`;
+                         } else {
+                              // Format date without year for future anniversary
+                             nextAnniversaryText = nextAnniversaryDate.toLocaleDateString(undefined, { month: 'short', day: 'numeric', timeZone: 'UTC' });
+                         }
+                     } else {
+                         console.warn("Invalid start date format:", startDateStr);
+                         daysTogether = 0;
+                         nextAnniversaryText = "Invalid Date";
+                     }
+                 } catch (e) {
+                    console.error("Error calculating date differences:", e);
+                    daysTogether = 0;
+                    nextAnniversaryText = "Error";
+                 }
+            }
+
+            // Upcoming Events Calculation
+             const todayForEvents = new Date(); todayForEvents.setHours(0,0,0,0); // Local midnight for comparison
+             const upcomingEvents = appData.events
+                .map(event => {
+                    try {
+                        // Parse YYYY-MM-DD as local date correctly
+                        const parts = event.date.split('-');
+                        const eventDate = new Date(parts[0], parts[1] - 1, parts[2]);
+                        eventDate.setHours(0,0,0,0); // Set to midnight local time
+                        return { ...event, dateObj: eventDate };
+                    } catch (e) {
+                        console.warn(`Invalid date for event "${event.name}": ${event.date}`);
+                        return { ...event, dateObj: new Date('invalid') }; // Mark as invalid
+                    }
+                 })
+                .filter(event => !isNaN(event.dateObj.getTime()) && event.dateObj >= todayForEvents) // Valid date and today or later
+                .sort((a, b) => a.dateObj - b.dateObj); // Sort by date ascending
+
+            if (upcomingEvents.length > 0) {
+                const nextEvent = upcomingEvents[0];
+                nextEventText = nextEvent.name;
+                nextEventDateText = formatDate(nextEvent.date); // Format using the original string
+            }
+
+            daysCountEl.textContent = daysTogether;
+            nextAnniversaryEl.textContent = nextAnniversaryText;
+            momentsCountEl.textContent = appData.memories.length + appData.photos.length;
+            nextEventNameEl.textContent = escapeHTML(nextEventText);
+            nextEventDateEl.textContent = nextEventDateText;
+        }
+        function updateCelebrationInfo() {
+            if (!celebrationInfoEl) return;
+            celebrationInfoEl.innerHTML = ''; // Clear previous info
+            const startDateStr = appData.settings.startDate;
+            if (!startDateStr) return;
+
+            try {
+                 // Parse dates as UTC midnight to avoid timezone shifts affecting comparisons
+                 const parts = startDateStr.split('-');
+                 const startDate = new Date(Date.UTC(parts[0], parts[1] - 1, parts[2]));
+                 if (isNaN(startDate.getTime())) return; // Invalid start date
+
+                 const today = new Date();
+                 const todayUTC = new Date(Date.UTC(today.getFullYear(), today.getMonth(), today.getDate()));
+
+                 // Only celebrate if today is strictly after start date
+                 if (todayUTC <= startDate) return;
+
+                 const startDay = startDate.getUTCDate();
+                 const startMonth = startDate.getUTCMonth();
+                 const todayDay = todayUTC.getUTCDate();
+                 const todayMonth = todayUTC.getUTCMonth();
+
+                 // Check for Anniversary
+                 if (startMonth === todayMonth && startDay === todayDay) {
+                     const years = todayUTC.getUTCFullYear() - startDate.getUTCFullYear();
+                     if (years > 0) { // Don't show for 0 years (start date is today)
+                         const nth = (n) => { if (n > 3 && n < 21) return 'th'; switch (n % 10) { case 1: return "st"; case 2: return "nd"; case 3: return "rd"; default: return "th"; } };
+                         // Consider adding animation classes if animate.css is included
+                         celebrationInfoEl.innerHTML = `<div class="p-3 bg-gradient text-white rounded-3 shadow-lg text-center">✨ Happy ${years}${nth(years)} Anniversary! ✨</div>`;
+                         return; // Show anniversary and stop
+                     }
+                 }
+
+                 // Check for Monthly Milestone (only if not anniversary)
+                 if (startDay === todayDay) {
+                     let monthsDiff = (todayUTC.getUTCFullYear() - startDate.getUTCFullYear()) * 12;
+                     monthsDiff -= startDate.getUTCMonth();
+                     monthsDiff += todayUTC.getUTCMonth();
+                     // Ensure monthsDiff is positive and greater than 0
+                     if (monthsDiff > 0) {
+                          celebrationInfoEl.innerHTML = `<div class="p-2 rounded-3 shadow-sm text-center" style="background: linear-gradient(to right, var(--custom-pink-light), var(--custom-teal-light)); color: var(--bs-pink);"><💖 Happy ${monthsDiff} Month${monthsDiff > 1 ? 's' : ''} Together! 💖</div>`;
+                     }
+                 }
+            } catch (e) { console.error("Error checking for celebrations:", e); }
+        }
+
+
+        // ---- Rendering Functions (Dashboard) ----
+        function renderMemories() {
+            if (!memoriesGridEl || !memoriesPlaceholderEl) return;
+            memoriesGridEl.innerHTML = ''; // Clear existing memories
+
+            if (appData.memories.length === 0) {
+                memoriesPlaceholderEl.classList.remove('d-none');
+                memoriesPlaceholderEl.classList.add('d-block'); // Ensure it's block or similar
+                return;
+            }
+            memoriesPlaceholderEl.classList.add('d-none'); // Hide placeholder
+            memoriesPlaceholderEl.classList.remove('d-block');
+
+            // Sort memories by date, newest first
+            const sortedMemories = [...appData.memories].sort((a, b) => {
+                // Handle potentially invalid dates gracefully
+                const dateA = a.date ? new Date(a.date) : new Date(0);
+                const dateB = b.date ? new Date(b.date) : new Date(0);
+                if (isNaN(dateA) && isNaN(dateB)) return 0;
+                if (isNaN(dateA)) return 1; // Put invalid dates last
+                if (isNaN(dateB)) return -1;
+                return dateB - dateA; // Newest first
+            });
+
+
+            sortedMemories.forEach(memory => {
+                const col = document.createElement('div');
+                col.className = 'col-md-6 col-lg-4'; // Bootstrap column classes
+
+                const card = document.createElement('div');
+                card.className = 'card bg-custom-pink-light h-100 shadow-sm position-relative group'; // Added 'group' for hover effect
+
+                card.innerHTML = `
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-start mb-2">
+                             <h4 class="card-title fs-6 fw-semibold text-custom-pink mb-0 me-2">${escapeHTML(memory.title)}</h4>
+                             <span class="text-muted small flex-shrink-0">${formatDate(memory.date) || 'No Date'}</span>
+                        </div>
+                        <p class="card-text text-body-secondary small mb-3" style="white-space: pre-wrap;">${escapeHTML(memory.description)}</p>
+                         ${memory.icon ? `<div class="fs-3 text-center my-2">${escapeHTML(memory.icon)}</div>` : ''}
+                    </div>
+                    <div class="position-absolute top-0 end-0 p-2 d-flex opacity-0 group-hover-opacity-100 transition-opacity">
+                         <button class="action-button edit-memory-btn" data-id="${memory.id}" title="Edit Memory">
+                              <i class="bi bi-pencil-fill text-custom-teal"></i>
+                         </button>
+                         <button class="action-button delete-memory-btn" data-id="${memory.id}" title="Delete Memory">
+                             <i class="bi bi-trash-fill text-danger"></i>
+                         </button>
+                    </div>
+                `;
+                 col.appendChild(card);
+                 memoriesGridEl.appendChild(col);
+            });
+        }
+
+         function renderGallery() {
+             if (!galleryGridEl || !galleryPlaceholderEl || !galleryFilterButtonsEl || !gallerySortEl) return;
+             galleryGridEl.innerHTML = ''; // Clear existing gallery
+
+             // --- Filtering ---
+             const activeFilterButton = galleryFilterButtonsEl.querySelector('.filter-btn-active');
+             const activeFilter = activeFilterButton ? activeFilterButton.dataset.filter : 'all';
+
+             // Defensive filtering: handle photos without a category
+             filteredPhotos = appData.photos.filter(photo => {
+                 if (activeFilter === 'all') return true;
+                 if (activeFilter === 'favorites') return photo.isFavorite;
+                  // Check if category exists and matches (case-insensitive)
+                 return photo.category && typeof photo.category === 'string' && photo.category.toLowerCase() === activeFilter;
+             });
+
+             // --- Sorting ---
+             const sortBy = gallerySortEl.value;
+             filteredPhotos.sort((a, b) => {
+                const dateA = a.date ? new Date(a.date + 'T00:00:00') : new Date(0); // Treat date string as local
+                const dateB = b.date ? new Date(b.date + 'T00:00:00') : new Date(0);
+                const titleA = (a.title || '').toLowerCase();
+                const titleB = (b.title || '').toLowerCase();
+
+                // Handle invalid dates during sort
+                const validDateA = !isNaN(dateA.getTime());
+                const validDateB = !isNaN(dateB.getTime());
+
+                 switch (sortBy) {
+                    case 'oldest':
+                        if (!validDateA && !validDateB) return 0;
+                        if (!validDateA) return 1; // Invalid dates last
+                        if (!validDateB) return -1;
+                        return dateA - dateB;
+                    case 'title_az': return titleA.localeCompare(titleB);
+                    case 'title_za': return titleB.localeCompare(titleA);
+                    case 'newest': default:
+                        if (!validDateA && !validDateB) return 0;
+                        if (!validDateA) return 1;
+                        if (!validDateB) return -1;
+                        return dateB - dateA;
+                }
+             });
+
+             // --- Display ---
+             if (filteredPhotos.length === 0) {
+                 galleryPlaceholderEl.classList.remove('d-none');
+                 galleryPlaceholderEl.classList.add('d-block'); // Ensure visible
+                 galleryPlaceholderEl.textContent = appData.photos.length === 0
+                    ? "Upload your first photo!"
+                    : `No photos found for filter "${activeFilter}".`;
+                 return;
+             }
+             galleryPlaceholderEl.classList.add('d-none'); // Hide placeholder
+             galleryPlaceholderEl.classList.remove('d-block');
+
+
+             filteredPhotos.forEach((photo, index) => {
+                 const col = document.createElement('div');
+                 col.className = 'col-6 col-md-4 col-lg-3'; // Responsive columns
+
+                 const galleryItem = document.createElement('div');
+                 galleryItem.className = 'gallery-item card bg-secondary bg-opacity-10 rounded-3 overflow-hidden shadow-sm group'; // Added 'group'
+
+                 // Ensure base64 source is valid, provide fallback?
+                 const imgSrc = photo.base64src && photo.base64src.startsWith('data:image') ? photo.base64src : 'placeholder.png'; // Add a placeholder if needed
+
+                 galleryItem.innerHTML = `
+                     <img src="${imgSrc}" alt="${escapeHTML(photo.title || 'Gallery image')}" class="gallery-image-trigger" data-index="${index}">
+                     <div class="gallery-overlay">
+                         <h5 class="text-white small fw-semibold text-truncate mb-0" title="${escapeHTML(photo.title || '')}">${escapeHTML(photo.title || 'Untitled')}</h5>
+                          <p class="text-white-50 small mb-0">${formatDate(photo.date) || 'No Date'}</p>
+                     </div>
+                     <div class="gallery-actions opacity-0 group-hover-opacity-100 transition-opacity">
+                          <button class="action-button favorite-btn ${photo.isFavorite ? 'favorited' : ''}" data-id="${photo.id}" title="${photo.isFavorite ? 'Unfavorite' : 'Favorite'}">
+                              <i class="bi ${photo.isFavorite ? 'bi-heart-fill' : 'bi-heart'}"></i>
+                          </button>
+                          <button class="action-button delete-photo-btn" data-id="${photo.id}" title="Delete Photo">
+                               <i class="bi bi-trash-fill text-danger"></i>
+                          </button>
+                     </div>
+                 `;
+                 col.appendChild(galleryItem);
+                 galleryGridEl.appendChild(col);
+             });
+         }
+
+        function renderNotes() {
+            if (!notesContainerEl || !notesPlaceholderEl) return;
+            notesContainerEl.innerHTML = ''; // Clear existing notes
+
+            if (appData.notes.length === 0) {
+                notesPlaceholderEl.classList.remove('d-none');
+                notesPlaceholderEl.classList.add('d-block'); // Ensure visible
+                return;
+            }
+            notesPlaceholderEl.classList.add('d-none'); // Hide placeholder
+            notesPlaceholderEl.classList.remove('d-block');
+
+            const sortedNotes = [...appData.notes].sort((a, b) => {
+                // Handle potential missing or invalid dates
+                 const dateA = a.date ? new Date(a.date) : new Date(0);
+                 const dateB = b.date ? new Date(b.date) : new Date(0);
+                 if (isNaN(dateA) && isNaN(dateB)) return 0;
+                 if (isNaN(dateA)) return 1; // Invalid dates last
+                 if (isNaN(dateB)) return -1;
+                 return dateB - dateA; // Newest first (based on ISO date string)
+            });
+
+
+            sortedNotes.forEach(note => {
+                const noteElement = document.createElement('div');
+                noteElement.className = 'border rounded-3 p-3 position-relative group bg-custom-teal-light'; // Added 'group'
+
+                noteElement.innerHTML = `
+                    <div class="d-flex justify-content-between align-items-start mb-1">
+                         <h5 class="fs-6 fw-semibold text-custom-teal flex-grow-1 me-3 mb-0">${escapeHTML(note.title)}</h5>
+                         <span class="text-muted small flex-shrink-0">${formatDate(note.date) || 'No Date'}</span>
+                    </div>
+                     <p class="text-body-secondary small text-break mb-0" style="white-space: pre-wrap;">${escapeHTML(note.content)}</p>
+                     <div class="position-absolute top-0 end-0 p-2 d-flex opacity-0 group-hover-opacity-100 transition-opacity">
+                         <button class="action-button edit-note-btn" data-id="${note.id}" title="Edit Note">
+                              <i class="bi bi-pencil-fill text-custom-teal"></i>
+                         </button>
+                         <button class="action-button delete-note-btn" data-id="${note.id}" title="Delete Note">
+                              <i class="bi bi-trash-fill text-danger"></i>
+                         </button>
+                    </div>
+                `;
+                notesContainerEl.appendChild(noteElement);
+            });
+        }
+
+         function renderEventsList(containerElement) {
+             if (!containerElement) return;
+             containerElement.innerHTML = ''; // Clear list
+
+             if (appData.events.length === 0) {
+                 containerElement.innerHTML = '<p class="text-muted text-center py-4">No events added yet.</p>';
+                 return;
+             }
+
+             const sortedEvents = [...appData.events]
+                 .map(event => {
+                     // Attempt to parse date, handle errors
+                      let dateObj; try { const parts = event.date.split('-'); dateObj = new Date(parts[0], parts[1]-1, parts[2]); } catch { dateObj = new Date(0); }
+                      return { ...event, dateObj: isNaN(dateObj.getTime()) ? new Date(0) : dateObj };
+                  })
+                 .sort((a, b) => a.dateObj - b.dateObj); // Sort ascending by date
+
+             sortedEvents.forEach(event => {
+                 const eventItem = document.createElement('div');
+                 eventItem.className = 'd-flex justify-content-between align-items-center p-2 border-bottom position-relative group'; // Added 'group'
+
+                 eventItem.innerHTML = `
+                    <div>
+                        <p class="fw-semibold mb-0">${escapeHTML(event.name)}</p>
+                         <p class="small text-muted mb-0">${formatDate(event.date) || 'Invalid Date'}</p>
+                         ${event.description ? `<p class="small text-body-secondary mt-1 mb-0 text-break">${escapeHTML(event.description)}</p>` : ''}
+                     </div>
+                     <div class="position-absolute top-50 end-0 translate-middle-y me-2 d-flex opacity-0 group-hover-opacity-100 transition-opacity">
+                         <button class="action-button edit-event-btn" data-id="${event.id}" title="Edit Event">
+                            <i class="bi bi-pencil-fill text-custom-teal"></i>
+                         </button>
+                         <button class="action-button delete-event-btn" data-id="${event.id}" title="Delete Event">
+                             <i class="bi bi-trash-fill text-danger"></i>
+                         </button>
+                    </div>
+                 `;
+                  containerElement.appendChild(eventItem);
+             });
+         }
+
+
+        // ---- Event Listeners Setup (Dashboard) ----
+        function setupDashboardEventListeners() {
+            // Theme Toggle
+            if (themeToggleBtn) {
+                themeToggleBtn.addEventListener('click', () => {
+                    const newTheme = document.documentElement.getAttribute('data-bs-theme') === 'dark' ? 'light' : 'dark';
+                    setTheme(newTheme);
+                     saveData(); // Save theme preference
+                });
+            }
+
+            // Logout Button
+            if (logoutBtn) {
+                logoutBtn.addEventListener('click', handleLogout);
+            }
+
+            // Settings Button
+            if (settingsBtn) settingsBtn.addEventListener('click', openSettingsModal);
+
+             // Add Memory Button
+             const addMemoryBtn = document.getElementById('add-memory');
+             if (addMemoryBtn) addMemoryBtn.addEventListener('click', () => openMemoryModal());
+
+            // Add Note Form Submission
+            if (addNoteFormEl) addNoteFormEl.addEventListener('submit', handleAddNote);
+
+             // Manage Events Button
+             const addEventBtn = document.getElementById('add-event-btn');
+             if (addEventBtn) addEventBtn.addEventListener('click', openEventManagerModal);
+
+
+            // Modal Form Submission (Generic)
+            if (modalFormEl) modalFormEl.addEventListener('submit', handleModalFormSubmit);
+
+            // Upload Button -> File Input Click
+            if (uploadBtn && imageUploadInput) {
+                uploadBtn.addEventListener('click', () => imageUploadInput.click());
+            }
+
+             // File Input Change
+             if (imageUploadInput) {
+                 imageUploadInput.addEventListener('change', (e) => {
+                     if (e.target.files.length > 0) {
+                        processFiles(e.target.files);
+                        e.target.value = null; // Reset input to allow uploading the same file again
+                    }
+                 });
+             }
+
+             // Drag and Drop Zone
+             if (dropZoneEl) setupDragAndDrop();
+
+            // Gallery Filtering
+             if (galleryFilterButtonsEl) {
+                 galleryFilterButtonsEl.addEventListener('click', (e) => {
+                     if (e.target.tagName === 'BUTTON' && e.target.dataset.filter) {
+                         // Remove active class from all buttons in the group
+                         galleryFilterButtonsEl.querySelectorAll('button').forEach(btn => {
+                             btn.classList.remove('filter-btn-active', 'btn-primary');
+                             btn.classList.add('btn-outline-primary');
+                         });
+                         // Add active class to the clicked button
+                         e.target.classList.add('filter-btn-active', 'btn-primary');
+                         e.target.classList.remove('btn-outline-primary');
+                         renderGallery(); // Re-render gallery with new filter
+                     }
+                 });
+             }
+
+
+             // Gallery Sorting
+             if (gallerySortEl) gallerySortEl.addEventListener('change', renderGallery);
+
+             // Image Viewer Buttons
+             if (prevImageBtn) prevImageBtn.addEventListener('click', showPreviousImage);
+             if (nextImageBtn) nextImageBtn.addEventListener('click', showNextImage);
+             if (editPhotoDetailsBtn && bsImageViewerModal) {
+                editPhotoDetailsBtn.addEventListener('click', () => {
+                     const currentPhoto = filteredPhotos[currentPhotoIndex];
+                     if (currentPhoto) {
+                         bsImageViewerModal.hide(); // Hide viewer first
+                         // Use setTimeout to ensure modal is hidden before opening the next
+                         setTimeout(() => openPhotoModal(currentPhoto.id), 150); // Delay slightly
+                     }
+                 });
+             }
+
+            // Event Delegation for dynamic content (Memories, Gallery, Notes)
+            setupEventDelegation();
+
+             // Smooth Scrolling for Nav Links
+             document.querySelectorAll('.navbar-nav .nav-link[href^="#"]').forEach(anchor => {
+                 anchor.addEventListener('click', function (e) {
+                     e.preventDefault();
+                     const targetId = this.getAttribute('href');
+                      const targetElement = document.querySelector(targetId);
+                     if(targetElement) {
+                          const navbarHeight = document.querySelector('.navbar.fixed-top')?.offsetHeight || 60; // Estimate navbar height
+                          const elementPosition = targetElement.getBoundingClientRect().top;
+                          const offsetPosition = elementPosition + window.pageYOffset - navbarHeight - 20; // Adjust offset (extra 20px padding)
+
+                          window.scrollTo({ top: offsetPosition, behavior: "smooth" });
+
+                           // Optional: Close mobile navbar after click
+                          const navbarCollapseEl = document.getElementById('navbarNav');
+                           if (navbarCollapseEl && navbarCollapseEl.classList.contains('show')) {
+                              const bsCollapse = bootstrap.Collapse.getInstance(navbarCollapseEl);
+                              if (bsCollapse) bsCollapse.hide();
+                          }
+                     }
+                 });
+             });
+
+             // Keyboard navigation for image viewer
+             document.addEventListener('keydown', (e) => {
+                 // Check if the modal element exists and is currently shown
+                 if (imageViewerModalEl && bsImageViewerModal && imageViewerModalEl.classList.contains('show')) {
+                     if (e.key === 'ArrowLeft') { e.preventDefault(); showPreviousImage(); }
+                     else if (e.key === 'ArrowRight') { e.preventDefault(); showNextImage(); }
+                     // Escape is handled by Bootstrap's modal JS
+                 }
+             });
+        }
+
+        function setupDragAndDrop() {
+              const dragEnterClasses = ['border-primary', 'bg-primary', 'bg-opacity-10'];
+              const dragLeaveClasses = [...dragEnterClasses]; // Classes to remove
+
+              dropZoneEl.addEventListener('dragenter', (e) => {
+                  e.preventDefault(); e.stopPropagation();
+                  dropZoneEl.classList.add(...dragEnterClasses);
+              });
+              dropZoneEl.addEventListener('dragover', (e) => {
+                  e.preventDefault(); // Necessary to allow drop
+                  e.stopPropagation();
+                  e.dataTransfer.dropEffect = 'copy'; // Indicate copying
+              });
+              dropZoneEl.addEventListener('dragleave', (e) => {
+                  e.preventDefault(); e.stopPropagation();
+                  // Only remove classes if leaving the drop zone element itself, not its children
+                  if (!dropZoneEl.contains(e.relatedTarget)) {
+                      dropZoneEl.classList.remove(...dragLeaveClasses);
+                  }
+              });
+              dropZoneEl.addEventListener('drop', (e) => {
+                  e.preventDefault(); e.stopPropagation();
+                  dropZoneEl.classList.remove(...dragLeaveClasses);
+                  const files = e.dataTransfer.files;
+                  if (files.length > 0) { processFiles(files); }
+              });
+          }
+
+         function setupEventDelegation() {
+             // Memories Grid Listener
+             if (memoriesGridEl) {
+                memoriesGridEl.addEventListener('click', (e) => {
+                     const editBtn = e.target.closest('.edit-memory-btn');
+                     const deleteBtn = e.target.closest('.delete-memory-btn');
+                     if (editBtn && editBtn.dataset.id) openMemoryModal(editBtn.dataset.id);
+                     else if (deleteBtn && deleteBtn.dataset.id) deleteItem('memory', deleteBtn.dataset.id);
+                 });
+             }
+             // Gallery Grid Listener
+             if (galleryGridEl) {
+                 galleryGridEl.addEventListener('click', (e) => {
+                     const favoriteBtn = e.target.closest('.favorite-btn');
+                     const deleteBtn = e.target.closest('.delete-photo-btn');
+                     const imageTrigger = e.target.closest('.gallery-image-trigger');
+
+                     if (favoriteBtn && favoriteBtn.dataset.id) toggleFavoritePhoto(favoriteBtn.dataset.id);
+                     else if (deleteBtn && deleteBtn.dataset.id) deleteItem('photo', deleteBtn.dataset.id);
+                     else if (imageTrigger && imageTrigger.dataset.index !== undefined) {
+                         const index = parseInt(imageTrigger.dataset.index, 10);
+                         if (!isNaN(index) && index >= 0 && index < filteredPhotos.length) openImageViewer(index);
+                     }
+                 });
+             }
+             // Notes Container Listener
+             if (notesContainerEl) {
+                 notesContainerEl.addEventListener('click', (e) => {
+                     const editBtn = e.target.closest('.edit-note-btn');
+                     const deleteBtn = e.target.closest('.delete-note-btn');
+                     if (editBtn && editBtn.dataset.id) openNoteModal(editBtn.dataset.id);
+                     else if (deleteBtn && deleteBtn.dataset.id) deleteItem('note', deleteBtn.dataset.id);
+                 });
+             }
+             // Event Management List actions are handled inside the modal setup
+         }
+
+        // ---- Action Handlers (Dashboard) ----
+        function handleAddNote(event) {
+             event.preventDefault();
+             if (!noteTitleInputEl || !noteContentInputEl) return;
+             const title = noteTitleInputEl.value.trim();
+             const content = noteContentInputEl.value.trim();
+             if (!title || !content) {
+                alert('Please provide both title and content for the note.');
+                return;
+             }
+             const newNote = {
+                id: generateId(),
+                title,
+                content,
+                date: new Date().toISOString() // Store as ISO string for consistent sorting
+             };
+             appData.notes.push(newNote);
+             saveData();
+             renderNotes();
+             addNoteFormEl.reset(); // Clear the form
+             showToast("Note added!");
+         }
+         function handleModalFormSubmit(event) {
+             event.preventDefault();
+             if (!modalFormEl || !editIdInput) return;
+
+             const formType = modalFormEl.dataset.formType;
+             const id = editIdInput.value; // Might be empty for 'add' operations
+
+             console.log(`Submitting modal form for type: ${formType}, ID: ${id || 'new'}`);
+             try {
+                 let saved = false;
+                 switch (formType) {
+                     case 'settings': saveSettings(); saved = true; break;
+                     case 'memory': saveMemory(id); saved = true; break;
+                     // 'event' saving is handled by specific button in event manager modal
+                     case 'photo': savePhotoDetails(id); saved = true; break;
+                     case 'note': saveNoteDetails(id); saved = true; break;
+                     case 'eventManager':
+                         // This form type doesn't submit the whole form directly
+                         console.log("Event manager modal form 'submit' triggered - likely shouldn't happen.");
+                         break;
+                     default:
+                        console.warn("Unknown modal form type:", formType);
+                        alert("Unknown form type. Cannot save.");
+                 }
+                 // Close modal only if save was attempted and successful (or not eventManager)
+                 if (saved && formType !== 'eventManager' && bsGenericModal) {
+                     closeModal('generic-modal');
+                 }
+             } catch (error) {
+                console.error(`Error saving modal form (${formType}):`, error);
+                alert(`Error saving: ${error.message}`);
+             }
+         }
+         function saveSettings() {
+             const name1Input = document.getElementById('user1Name');
+             const name2Input = document.getElementById('user2Name');
+             const startDateInput = document.getElementById('startDate');
+
+             // Basic validation
+             if (!name1Input || !name2Input || !startDateInput) {
+                throw new Error("Settings form elements not found in the modal.");
+             }
+
+             const name1 = name1Input.value.trim() || "Partner 1"; // Default if empty
+             const name2 = name2Input.value.trim() || "Partner 2"; // Default if empty
+             const startDate = startDateInput.value; // YYYY-MM-DD format from input type="date"
+
+             // Validate date format (though type="date" helps)
+             if (startDate && !/^\d{4}-\d{2}-\d{2}$/.test(startDate)) {
+                 alert("Invalid date format. Please use YYYY-MM-DD.");
+                 throw new Error("Invalid date format."); // Prevent saving bad date
+             }
+
+             appData.settings.user1Name = name1;
+             appData.settings.user2Name = name2;
+             appData.settings.startDate = startDate;
+
+             saveData();
+             updateGreeting(); // Update UI elements immediately
+             updateDashboardCounters();
+             updateCelebrationInfo();
+             showToast("Settings saved!");
+         }
+         function saveMemory(id) {
+             const titleInput = document.getElementById('memoryTitle');
+             const dateInput = document.getElementById('memoryDate');
+             const descriptionInput = document.getElementById('memoryDescription');
+             const iconInput = document.getElementById('memoryIcon');
+
+             if (!titleInput || !dateInput || !descriptionInput || !iconInput) {
+                 throw new Error("Memory form elements not found in the modal.");
+             }
+             const title = titleInput.value.trim();
+             const date = dateInput.value; // YYYY-MM-DD
+             const description = descriptionInput.value.trim();
+             const icon = iconInput.value.trim(); // Emoji or short text
+
+             if (!title || !date || !description) {
+                 // Use alert for user feedback, throw Error for code flow
+                 alert("Please fill in Title, Date, and Description for the memory.");
+                 throw new Error("Missing required memory fields.");
+             }
+             if (!/^\d{4}-\d{2}-\d{2}$/.test(date)) {
+                  alert("Invalid date format. Please use YYYY-MM-DD.");
+                 throw new Error("Invalid date format.");
+             }
+
+             const memoryData = { title, date, description, icon };
+
+             if (id) { // Editing existing memory
+                 const memoryIndex = appData.memories.findIndex(m => m.id === id);
+                 if (memoryIndex > -1) {
+                     // Preserve original ID, update other fields
+                     appData.memories[memoryIndex] = { ...appData.memories[memoryIndex], ...memoryData };
+                     showToast("Memory updated!");
+                 } else {
+                     console.error(`Memory with ID ${id} not found for editing.`);
+                     throw new Error("Memory not found for update.");
+                 }
+             } else { // Adding new memory
+                 appData.memories.push({ id: generateId(), ...memoryData });
+                 showToast("Memory added!");
+             }
+             saveData();
+             renderMemories();
+             updateDashboardCounters(); // Update count
+         }
+          function saveEvent(id) { // Called from Event Manager modal button, not form submit
+              const nameInput = document.getElementById('eventName');
+              const dateInput = document.getElementById('eventDate');
+              const descriptionInput = document.getElementById('eventDescription');
+
+              if (!nameInput || !dateInput || !descriptionInput) {
+                  throw new Error("Event form elements not found in the modal.");
+              }
+              const name = nameInput.value.trim();
+              const date = dateInput.value; // YYYY-MM-DD
+              const description = descriptionInput.value.trim();
+
+              if (!name || !date) {
+                  alert("Please provide both Name and Date for the event.");
+                  throw new Error("Missing required event fields.");
+              }
+              if (!/^\d{4}-\d{2}-\d{2}$/.test(date)) {
+                   alert("Invalid date format. Please use YYYY-MM-DD.");
+                  throw new Error("Invalid date format.");
+              }
+
+              const eventData = { name, date, description };
+
+              if (id) { // Editing existing event
+                  const eventIndex = appData.events.findIndex(e => e.id === id);
+                  if (eventIndex > -1) {
+                      appData.events[eventIndex] = { ...appData.events[eventIndex], ...eventData };
+                      showToast("Event updated!");
+                  } else {
+                       console.error(`Event with ID ${id} not found for editing.`);
+                      throw new Error("Event not found for update.");
+                  }
+              } else { // Adding new event
+                  appData.events.push({ id: generateId(), ...eventData });
+                  showToast("Event added!");
+              }
+              saveData();
+              // Re-render the list within the modal if it's open
+              const eventListContainer = document.getElementById('event-list-container');
+              if (eventListContainer && bsGenericModal && genericModalEl.classList.contains('show')) {
+                  renderEventsList(eventListContainer);
+              }
+              updateDashboardCounters(); // Update upcoming event display
+          }
+          function savePhotoDetails(id) {
+              const titleInput = document.getElementById('photoTitle');
+              const descriptionInput = document.getElementById('photoDescription');
+              const dateInput = document.getElementById('photoDate');
+              const categorySelect = document.getElementById('photoCategory');
+
+              if (!titleInput || !descriptionInput || !dateInput || !categorySelect || !id) {
+                  throw new Error("Photo details form elements not found or ID missing.");
+              }
+
+              const photoIndex = appData.photos.findIndex(p => p.id === id);
+              if (photoIndex === -1) {
+                  throw new Error(`Photo with ID ${id} not found.`);
+              }
+
+              const title = titleInput.value.trim();
+              const description = descriptionInput.value.trim();
+              const date = dateInput.value; // YYYY-MM-DD or empty string
+              const category = categorySelect.value; // Value from select options
+
+              // Validate date format if not empty
+              if (date && !/^\d{4}-\d{2}-\d{2}$/.test(date)) {
+                   alert("Invalid date format. Please use YYYY-MM-DD or leave blank.");
+                  throw new Error("Invalid date format.");
+              }
+
+              // Update the photo object in the array
+              appData.photos[photoIndex] = {
+                  ...appData.photos[photoIndex], // Keep existing fields like base64src, id, isFavorite
+                  title,
+                  description,
+                  date: date || null, // Store empty string as null for consistency? Or keep empty string? Let's use null.
+                  category
+              };
+
+              saveData();
+              renderGallery(); // Re-render to reflect changes (title, date might affect sorting/display)
+              showToast("Photo details updated!");
+
+              // If the image viewer is open and showing this photo, update its content too
+               if (bsImageViewerModal && imageViewerModalEl.classList.contains('show') && filteredPhotos[currentPhotoIndex]?.id === id) {
+                  updateImageViewerContent(currentPhotoIndex); // Update viewer title, desc, date
+               }
+          }
+          function saveNoteDetails(id) {
+              const titleInput = document.getElementById('noteTitleEdit');
+              const contentInput = document.getElementById('noteContentEdit');
+
+              if (!titleInput || !contentInput || !id) {
+                  throw new Error("Note edit form elements not found or ID missing.");
+              }
+
+              const noteIndex = appData.notes.findIndex(n => n.id === id);
+              if (noteIndex === -1) {
+                  throw new Error(`Note with ID ${id} not found.`);
+              }
+
+              const title = titleInput.value.trim();
+              const content = contentInput.value.trim();
+
+              if (!title || !content) {
+                  alert("Note title and content cannot be empty.");
+                  throw new Error("Title and content required.");
+              }
+
+              // Update the note object
+              // Note: We don't update the 'date' here, keeping the original creation date.
+              appData.notes[noteIndex] = {
+                  ...appData.notes[noteIndex],
+                  title,
+                  content
+              };
+
+              saveData();
+              renderNotes(); // Re-render notes list
+              showToast("Note updated!");
+          }
+         function deleteItem(type, id) {
+             if (!id) return;
+
+             const itemTypeMap = {
+                memory: { array: appData.memories, nameKey: 'title', renderFunc: renderMemories },
+                note:   { array: appData.notes, nameKey: 'title', renderFunc: renderNotes },
+                photo:  { array: appData.photos, nameKey: 'title', renderFunc: renderGallery },
+                event:  { array: appData.events, nameKey: 'name', renderFunc: () => {
+                    // Special handling for events: re-render list in modal if open
+                    const eventListContainer = document.getElementById('event-list-container');
+                    if (eventListContainer && bsGenericModal && genericModalEl.classList.contains('show')) {
+                        renderEventsList(eventListContainer);
+                    }
+                    updateDashboardCounters(); // Update main dashboard event display
+                } },
+             };
+
+             if (!itemTypeMap[type]) {
+                 console.error("Invalid item type for deletion:", type);
+                 return;
+             }
+
+             const { array, nameKey, renderFunc } = itemTypeMap[type];
+             const itemIndex = array.findIndex(item => item.id === id);
+
+             if (itemIndex === -1) {
+                 console.warn(`Could not find ${type} with ID ${id} to delete.`);
+                 alert(`Error deleting ${type}. Item not found.`);
+                 return;
+             }
+
+             const item = array[itemIndex];
+             const itemName = item[nameKey] || `item ${id.substring(0, 6)}`; // Get name or fallback
+
+             // Confirmation Dialog
+             if (!showConfirmation(`Are you sure you want to delete this ${type}:\n"${itemName}"?`)) {
+                 return; // User cancelled
+             }
+
+             // Perform Deletion
+             array.splice(itemIndex, 1); // Remove item from the array
+
+             // Save and Re-render
+             saveData();
+             if (renderFunc) renderFunc(); // Call the appropriate render function
+             if (type !== 'event') updateDashboardCounters(); // Update general counters (unless it's an event, handled by its render func)
+
+             showToast(`${capitalize(type)} deleted.`);
+             console.log(`${capitalize(type)} with ID ${id} deleted.`);
+         }
+         function toggleFavoritePhoto(id) {
+             if (!id) return;
+             const photoIndex = appData.photos.findIndex(p => p.id === id);
+
+             if (photoIndex > -1) {
+                 appData.photos[photoIndex].isFavorite = !appData.photos[photoIndex].isFavorite;
+                 saveData();
+                 renderGallery(); // Re-render to update heart icon and potentially filter
+                 showToast(appData.photos[photoIndex].isFavorite ? "Photo favorited!" : "Photo unfavorited.");
+
+                 // Optional: Update favorite button in viewer if open and showing this photo
+                 // (Requires adding a favorite button to the viewer modal)
+             } else {
+                 console.warn(`Photo ID ${id} not found for favorite toggle.`);
+             }
+         }
+
+        // ---- Modal Handling (Dashboard) ----
+        function openModal(modalId, title, formType, bodyContentHTML, itemId = null) {
+            // Only use generic modal for now
+            const targetModalInstance = modalId === 'generic-modal' ? bsGenericModal : null;
+            const targetModalEl = modalId === 'generic-modal' ? genericModalEl : null;
+
+            if (!targetModalInstance || !targetModalEl) {
+                console.error(`Bootstrap Modal instance or element for ID "${modalId}" not found.`);
+                return;
+            }
+
+             // Reset form fields *before* setting content
+             if (modalFormEl) modalFormEl.reset();
+             if (editIdInput) editIdInput.value = itemId || '';
+             if (modalFormEl) modalFormEl.dataset.formType = formType;
+
+             // Update title and inject body content
+             if (modalTitleEl) modalTitleEl.textContent = title;
+             if (modalBodyEl) modalBodyEl.innerHTML = bodyContentHTML;
+
+             // Show the modal
+             targetModalInstance.show();
+
+             // Special handling AFTER content is set (e.g., event manager listeners)
+             if (formType === 'eventManager') {
+                 // Add listeners specific to the event manager controls
+                  setupModalEventListeners();
+
+                 // Ensure the 'add/edit' button state is correct initially (Add mode)
+                 resetEventForm();
+             }
+        }
+
+        function closeModal(modalId) {
+             const targetModalInstance = modalId === 'generic-modal' ? bsGenericModal : null;
+
+             if (targetModalInstance) {
+                 targetModalInstance.hide();
+
+                 // Optional: Add event listener for 'hidden.bs.modal' to cleanup AFTER animation
+                  const targetModalEl = modalId === 'generic-modal' ? genericModalEl : null;
+                  if (targetModalEl) {
+                      targetModalEl.addEventListener('hidden.bs.modal', () => {
+                          // Clean up content and listeners
+                          if (modalBodyEl) modalBodyEl.innerHTML = ''; // Clear injected content
+                          if (editIdInput) editIdInput.value = '';
+                          if (modalFormEl) modalFormEl.removeAttribute('data-form-type');
+                          removeModalEventListeners(); // Remove event manager specific listeners
+                      }, { once: true }); // Listener runs only once per hide event
+                  }
+             }
+        }
+
+        function openSettingsModal() {
+             const settings = appData.settings;
+             const bodyHTML = `
+                 <div class="mb-3">
+                     <label for="user1Name" class="form-label small text-muted">Partner 1 Name</label>
+                     <input type="text" id="user1Name" value="${escapeHTML(settings.user1Name || '')}" class="form-control modal-input">
+                 </div>
+                 <div class="mb-3">
+                     <label for="user2Name" class="form-label small text-muted">Partner 2 Name</label>
+                     <input type="text" id="user2Name" value="${escapeHTML(settings.user2Name || '')}" class="form-control modal-input">
+                 </div>
+                 <div>
+                     <label for="startDate" class="form-label small text-muted">Relationship Start Date</label>
+                     <input type="date" id="startDate" value="${settings.startDate || ''}" class="form-control modal-input" max="${new Date().toISOString().split("T")[0]}"> <div class="form-text small text-muted mt-1">Used for counters and anniversary calculations.</div>
+                 </div>
+             `;
+             openModal('generic-modal', 'Dashboard Settings', 'settings', bodyHTML);
+         }
+
+         function openMemoryModal(id = null) {
+             const isEditing = id !== null;
+             const memory = isEditing ? appData.memories.find(m => m.id === id) : null;
+
+              if (isEditing && !memory) {
+                console.error(`Memory with ID ${id} not found for editing.`);
+                alert("Error: Memory not found.");
+                return;
+              }
+
+             const title = isEditing ? 'Edit Memory' : 'Add New Memory';
+             const bodyHTML = `
+                 <div class="mb-3">
+                     <label for="memoryTitle" class="form-label small text-muted">Title <span class="text-danger">*</span></label>
+                     <input type="text" id="memoryTitle" value="${isEditing ? escapeHTML(memory.title) : ''}" required class="form-control modal-input">
+                 </div>
+                 <div class="mb-3">
+                     <label for="memoryDate" class="form-label small text-muted">Date <span class="text-danger">*</span></label>
+                     <input type="date" id="memoryDate" value="${isEditing ? memory.date : ''}" required class="form-control modal-input" max="${new Date().toISOString().split("T")[0]}"> </div>
+                 <div class="mb-3">
+                     <label for="memoryDescription" class="form-label small text-muted">Description <span class="text-danger">*</span></label>
+                     <textarea id="memoryDescription" rows="4" required class="form-control modal-input">${isEditing ? escapeHTML(memory.description) : ''}</textarea>
+                 </div>
+                  <div>
+                     <label for="memoryIcon" class="form-label small text-muted">Emoji Icon (Optional)</label>
+                      <input type="text" id="memoryIcon" value="${isEditing ? escapeHTML(memory.icon || '') : ''}" placeholder="e.g., 🎉, ❤️, ✈️" maxlength="4" class="form-control modal-input" style="font-size: 1.2em; text-align: center; width: 5em;">
+                      <div class="form-text small text-muted mt-1">A single emoji works best.</div>
+                  </div>
+             `;
+             openModal('generic-modal', title, 'memory', bodyHTML, id);
+         }
+
+         function openNoteModal(id) {
+              if (!id) return;
+              const note = appData.notes.find(n => n.id === id);
+              if (!note) {
+                console.error(`Note with ID ${id} not found for editing.`);
+                alert("Error: Note not found.");
+                return;
+              }
+              const title = 'Edit Note';
+              const bodyHTML = `
+                  <div class="mb-3">
+                      <label for="noteTitleEdit" class="form-label small text-muted">Title <span class="text-danger">*</span></label>
+                      <input type="text" id="noteTitleEdit" value="${escapeHTML(note.title)}" required class="form-control modal-input">
+                  </div>
+                  <div>
+                      <label for="noteContentEdit" class="form-label small text-muted">Content <span class="text-danger">*</span></label>
+                      <textarea id="noteContentEdit" rows="6" required class="form-control modal-input">${escapeHTML(note.content)}</textarea>
+                  </div>
+              `;
+              openModal('generic-modal', title, 'note', bodyHTML, id);
+          }
+
+         function openPhotoModal(id) {
+             if (!id) return;
+             const photo = appData.photos.find(p => p.id === id);
+             if (!photo) {
+                 console.error(`Photo with ID ${id} not found for editing.`);
+                 alert("Error: Photo not found.");
+                 return;
+             }
+             const title = 'Edit Photo Details';
+             const categories = ['dates', 'trips', 'events', 'other']; // Available categories
+             const categoryOptions = categories.map(cat =>
+                `<option value="${cat}" ${photo.category === cat ? 'selected' : ''}>${capitalize(cat)}</option>`
+             ).join('');
+
+             const bodyHTML = `
+                  <div class="mb-3 text-center">
+                      <img src="${photo.base64src}" alt="Preview" class="img-thumbnail mx-auto" style="max-height: 150px; width: auto; border-radius: 0.375rem;">
+                  </div>
+                 <div class="mb-3">
+                     <label for="photoTitle" class="form-label small text-muted">Title</label>
+                     <input type="text" id="photoTitle" value="${escapeHTML(photo.title || '')}" class="form-control modal-input">
+                 </div>
+                 <div class="mb-3">
+                     <label for="photoDescription" class="form-label small text-muted">Description</label>
+                     <textarea id="photoDescription" rows="3" class="form-control modal-input">${escapeHTML(photo.description || '')}</textarea>
+                 </div>
+                 <div class="mb-3">
+                     <label for="photoDate" class="form-label small text-muted">Date Taken</label>
+                      <input type="date" id="photoDate" value="${photo.date || ''}" class="form-control modal-input" max="${new Date().toISOString().split("T")[0]}"> </div>
+                 <div>
+                     <label for="photoCategory" class="form-label small text-muted">Category</label>
+                     <select id="photoCategory" class="form-select modal-input">
+                          <option value="">-- No Category --</option> ${categoryOptions}
+                     </select>
+                 </div>
+             `;
+             openModal('generic-modal', title, 'photo', bodyHTML, id);
+         }
+
+        function openEventManagerModal() {
+             const title = 'Manage Upcoming Events';
+             const bodyHTML = `
+                 <div class="mb-4 pb-3 border-bottom">
+                     <h4 id="event-form-title" class="fs-6 fw-semibold mb-3 text-custom-teal">Add New Event</h4>
+                     <input type="hidden" id="eventEditId"> <div class="vstack gap-2">
+                         <div>
+                             <input type="text" id="eventName" required class="form-control form-control-sm modal-input" placeholder="Event Name *">
+                         </div>
+                         <div>
+                             <input type="date" id="eventDate" required class="form-control form-control-sm modal-input" placeholder="Date *" min="${new Date().toISOString().split("T")[0]}"> </div>
+                         <div>
+                             <textarea id="eventDescription" rows="2" class="form-control form-control-sm modal-input" placeholder="Description (Optional)"></textarea>
+                         </div>
+                         <div class="d-flex justify-content-end gap-2 mt-1">
+                              <button type="button" id="cancel-edit-event-btn" class="btn btn-sm btn-outline-secondary rounded-pill px-3" style="display: none;">Cancel Edit</button>
+                              <button type="button" id="add-edit-event-btn" class="btn btn-sm btn-success rounded-pill px-3">Add Event</button>
+                         </div>
+                     </div>
+                 </div>
+
+                 <h4 class="fs-6 fw-semibold mb-2 text-custom-pink">Existing Events</h4>
+                 <div id="event-list-container" class="vstack gap-1" style="max-height: 200px; overflow-y: auto; padding-right: 5px;">
+                     </div>
+             `;
+             // Use 'eventManager' type to prevent default form submission and handle via buttons
+             openModal('generic-modal', title, 'eventManager', bodyHTML);
+
+             // Render list AFTER modal content is set and modal is opening/shown
+             const eventListContainer = document.getElementById('event-list-container');
+             if (eventListContainer) {
+                 renderEventsList(eventListContainer);
+             } else {
+                console.error("Event list container not found in modal immediately after openModal call.");
+                // Optional: Try rendering again after a short delay if DOM timing is an issue
+                // setTimeout(() => {
+                //     const container = document.getElementById('event-list-container');
+                //     if (container) renderEventsList(container);
+                // }, 50);
+             }
+         }
+
+         // --- Event manager modal specific listeners/handlers ---
+          let eventModalListenerController = null; // AbortController for cleanup
+
+          function setupModalEventListeners() {
+              // Remove previous listeners if any
+              removeModalEventListeners();
+
+              eventModalListenerController = new AbortController();
+              const signal = eventModalListenerController.signal;
+
+              const addEditBtn = document.getElementById('add-edit-event-btn');
+              const cancelEditBtn = document.getElementById('cancel-edit-event-btn');
+              const eventListContainer = document.getElementById('event-list-container');
+
+              if (addEditBtn) {
+                addEditBtn.addEventListener('click', handleAddOrUpdateEventFromModal, { signal });
+              }
+              if (cancelEditBtn) {
+                cancelEditBtn.addEventListener('click', resetEventForm, { signal });
+              }
+              // Use event delegation on the container for edit/delete buttons in the list
+              if (eventListContainer) {
+                eventListContainer.addEventListener('click', handleEventListActions, { signal });
+              }
+          }
+
+          function removeModalEventListeners() {
+              if (eventModalListenerController) {
+                  eventModalListenerController.abort(); // Abort pending listeners
+                  eventModalListenerController = null;
+                  // console.log("Removed event manager modal listeners.");
+              }
+          }
+
+          function handleAddOrUpdateEventFromModal() {
+              const id = document.getElementById('eventEditId')?.value || null; // Get ID for edit, null for add
+              try {
+                  saveEvent(id); // Call the save function (handles add/edit logic)
+                  resetEventForm(); // Clear form fields after successful save
+              } catch (error) {
+                  // Errors (like validation) are typically handled within saveEvent with alerts
+                  console.error("Error saving event from modal button:", error);
+                  // No alert here as saveEvent should handle user feedback
+              }
+          }
+
+          function handleEventListActions(e) {
+              const editBtn = e.target.closest('.edit-event-btn');
+              const deleteBtn = e.target.closest('.delete-event-btn');
+
+              if (editBtn && editBtn.dataset.id) {
+                populateEventFormForEdit(editBtn.dataset.id);
+              } else if (deleteBtn && deleteBtn.dataset.id) {
+                deleteItem('event', deleteBtn.dataset.id); // Call delete function for the event
+              }
+          }
+
+          function populateEventFormForEdit(id) {
+              const event = appData.events.find(e => e.id === id);
+              if (!event) {
+                 console.error(`Event with ID ${id} not found for editing.`);
+                 return;
+              }
+
+              // Get form elements
+              const idInput = document.getElementById('eventEditId');
+              const nameInput = document.getElementById('eventName');
+              const dateInput = document.getElementById('eventDate');
+              const descriptionInput = document.getElementById('eventDescription');
+              const formTitle = document.getElementById('event-form-title');
+              const addEditBtn = document.getElementById('add-edit-event-btn');
+              const cancelEditBtn = document.getElementById('cancel-edit-event-btn');
+
+              // Populate form fields
+              if (idInput) idInput.value = event.id;
+              if (nameInput) nameInput.value = event.name;
+              if (dateInput) dateInput.value = event.date; // Assumes YYYY-MM-DD format
+              if (descriptionInput) descriptionInput.value = event.description || '';
+
+              // Update button text and visibility
+              if (formTitle) formTitle.textContent = 'Edit Event';
+              if (addEditBtn) addEditBtn.textContent = 'Update Event';
+              if (cancelEditBtn) cancelEditBtn.style.display = 'inline-block'; // Show cancel button
+          }
+
+          function resetEventForm() {
+              // Get form elements
+              const idInput = document.getElementById('eventEditId');
+              const nameInput = document.getElementById('eventName');
+              const dateInput = document.getElementById('eventDate');
+              const descriptionInput = document.getElementById('eventDescription');
+              const formTitle = document.getElementById('event-form-title');
+              const addEditBtn = document.getElementById('add-edit-event-btn');
+              const cancelEditBtn = document.getElementById('cancel-edit-event-btn');
+
+              // Clear fields
+              if (idInput) idInput.value = '';
+              if (nameInput) nameInput.value = '';
+              if (dateInput) dateInput.value = '';
+              if (descriptionInput) descriptionInput.value = '';
+
+              // Reset button text and visibility
+              if (formTitle) formTitle.textContent = 'Add New Event';
+              if (addEditBtn) addEditBtn.textContent = 'Add Event';
+              if (cancelEditBtn) cancelEditBtn.style.display = 'none'; // Hide cancel button
+          }
+
+
+        // ---- Image Handling & Viewer (Dashboard) ----
+        function processFiles(files) {
+             showLoading("Processing images...");
+             const maxFileSizeMB = 5; // Max size in MB
+             const maxFileSizeBytes = maxFileSizeMB * 1024 * 1024;
+             let filesProcessed = 0;
+             let filesSkippedSize = 0;
+             let filesSkippedError = 0;
+             let filesRead = 0; // Counter for completed FileReader operations
+
+             // Filter for image types first
+             const imageFiles = Array.from(files).filter(file => file.type.startsWith('image/'));
+             const nonImageFilesCount = files.length - imageFiles.length;
+
+             if (nonImageFilesCount > 0) {
+                 alert(`Ignoring ${nonImageFilesCount} non-image file(s).`);
+             }
+
+             if(imageFiles.length === 0) {
+                 hideLoading();
+                 if (nonImageFilesCount === 0) { // Only show if no images were selected at all
+                     alert("No image files selected.");
+                 }
+                 return;
+             }
+
+             const totalImagesToProcess = imageFiles.length;
+
+             const checkCompletion = () => {
+                 // Check if all FileReader operations (success or error) are done
+                 if (filesRead === totalImagesToProcess) {
+                     hideLoading();
+                     if (filesProcessed > 0) {
+                         saveData();
+                         renderGallery();
+                         updateDashboardCounters();
+                     }
+                     // Construct final message
+                     let message = "";
+                     if (filesProcessed > 0) {
+                         message += `${filesProcessed} image(s) added successfully.`;
+                     } else {
+                         message += "No images were added."
+                     }
+                     if (filesSkippedSize > 0) {
+                         message += ` ${filesSkippedSize} skipped (larger than ${maxFileSizeMB}MB).`;
+                     }
+                     if (filesSkippedError > 0) {
+                         message += ` ${filesSkippedError} skipped due to reading errors.`;
+                     }
+                      // Use toast for success, alert for mixed results or failures
+                      if (filesProcessed > 0 && filesSkippedSize === 0 && filesSkippedError === 0) {
+                         showToast(`${filesProcessed} image(s) added!`);
+                      } else {
+                         alert(message);
+                      }
+                 }
+             };
+
+             imageFiles.forEach(file => {
+                 // Check file size
+                 if (file.size > maxFileSizeBytes) {
+                     console.warn(`Skipping large file: ${file.name} (${(file.size / 1024 / 1024).toFixed(2)}MB)`);
+                     filesSkippedSize++;
+                     filesRead++; // Count as 'read' (processed) for completion check
+                     checkCompletion();
+                     return; // Skip to next file
+                 }
+
+                 const reader = new FileReader();
+
+                 reader.onload = (e) => {
+                     // Basic validation of result
+                     if (e.target.result && e.target.result.startsWith('data:image')) {
+                        const newPhoto = {
+                            id: generateId(),
+                            title: file.name.split('.').slice(0, -1).join('.') || 'Untitled', // Basic title from filename
+                            description: "",
+                            date: new Date().toISOString().split('T')[0], // Default to today's date
+                            category: "other", // Default category
+                            base64src: e.target.result,
+                            isFavorite: false
+                        };
+                        appData.photos.push(newPhoto);
+                        filesProcessed++;
+                     } else {
+                         console.error("Error reading file (invalid result):", file.name);
+                         filesSkippedError++;
+                     }
+                      filesRead++; // Increment read counter
+                      checkCompletion(); // Check if all files are done
+                 };
+
+                 reader.onerror = (error) => {
+                     console.error("Error reading file:", file.name, error);
+                     filesSkippedError++;
+                     filesRead++; // Increment read counter
+                     checkCompletion(); // Check if all files are done
+                 };
+
+                 reader.readAsDataURL(file); // Start reading
+             });
+         }
+
+        function openImageViewer(index) {
+             // Check if modal instance and data exist
+             if (!bsImageViewerModal || index < 0 || index >= filteredPhotos.length) {
+                 console.error("Image viewer error: Modal not ready or invalid index:", index);
+                 return;
+             }
+             currentPhotoIndex = index;
+             updateImageViewerContent(index); // Populate modal content
+             bsImageViewerModal.show(); // Show the modal
+         }
+
+        // Close function might not be needed if using data-bs-dismiss, but kept for clarity/programmatic close
+        function closeImageViewer() {
+             if (bsImageViewerModal) {
+                 bsImageViewerModal.hide();
+                 // Optional: Clear src after hide animation completes using modal events
+                 if (imageViewerModalEl) {
+                     imageViewerModalEl.addEventListener('hidden.bs.modal', () => {
+                        if (currentImageEl) currentImageEl.src = ""; // Clear image src
+                        if (imageTitleEl) imageTitleEl.textContent = "";
+                        if (imageDescriptionEl) imageDescriptionEl.textContent = "";
+                        if (imageDateEl) imageDateEl.textContent = "";
+                     }, { once: true });
+                 }
+             }
+         }
+
+        function updateImageViewerContent(index) {
+            // Ensure all elements exist before updating
+             if (!currentImageEl || !imageTitleEl || !imageDescriptionEl || !imageDateEl || !prevImageBtn || !nextImageBtn) {
+                 console.error("Image viewer elements not found.");
+                 closeImageViewer(); // Close if elements are missing
+                 return;
+             }
+
+            const photo = filteredPhotos[index];
+            if (!photo) {
+                console.error("Photo data not found for index:", index);
+                closeImageViewer(); // Close if photo data is missing
+                return;
+            }
+
+            // Update content
+            currentImageEl.src = photo.base64src || ''; // Handle missing src gracefully
+            imageTitleEl.textContent = photo.title || 'Untitled';
+            imageDescriptionEl.textContent = photo.description || '';
+            imageDateEl.textContent = formatDate(photo.date) || ''; // Format date or show empty
+
+            // Update navigation buttons state
+            prevImageBtn.disabled = index === 0;
+            prevImageBtn.style.opacity = index === 0 ? '0.3' : '1'; // Dim if disabled
+
+            nextImageBtn.disabled = index === filteredPhotos.length - 1;
+            nextImageBtn.style.opacity = index === filteredPhotos.length - 1 ? '0.3' : '1'; // Dim if disabled
+
+            // Update the edit button (if needed, e.g., to pass the current photo ID)
+             if (editPhotoDetailsBtn) {
+                 editPhotoDetailsBtn.dataset.photoId = photo.id; // Store ID for the edit action
+             }
+        }
+        function showPreviousImage() {
+            if (currentPhotoIndex > 0) {
+                currentPhotoIndex--;
+                updateImageViewerContent(currentPhotoIndex);
+            }
+        }
+        function showNextImage() {
+            if (currentPhotoIndex < filteredPhotos.length - 1) {
+                currentPhotoIndex++;
+                updateImageViewerContent(currentPhotoIndex);
+            }
+        }
+
+        // ---- Utility Functions ----
+        function generateId() {
+             // Use crypto.randomUUID if available (more robust)
+             if (crypto && crypto.randomUUID) {
+                 return crypto.randomUUID();
+             }
+             // Fallback for older browsers
+             else {
+                 return Date.now().toString(36) + Math.random().toString(36).substring(2, 15);
+             }
+         }
+         function formatDate(dateString) {
+             // Input expected: YYYY-MM-DD or ISO string
+             if (!dateString) return null; // Return null if empty or null
+
+             try {
+                  // Attempt to create a date object. Add T00:00:00 to treat YYYY-MM-DD as local date.
+                  // ISO strings already have timezone info (or imply UTC with 'Z').
+                  const date = new Date(dateString.includes('T') ? dateString : dateString + 'T00:00:00');
+
+                 // Check if the date is valid after parsing
+                 if (isNaN(date.getTime())) {
+                     // console.warn("Invalid date string provided to formatDate:", dateString);
+                     return null; // Return null for invalid dates
+                 }
+
+                 // Format the valid date
+                 return date.toLocaleDateString(undefined, { // Use browser's locale and preferred format
+                     year: 'numeric',
+                     month: 'short', // e.g., 'Mar'
+                     day: 'numeric'
+                 });
+             } catch (e) {
+                 console.error("Error formatting date:", dateString, e);
+                 return dateString; // Return original string as fallback on error
+             }
+         }
+         function escapeHTML(str) {
+            if (str === null || str === undefined) return ''; // Handle null/undefined gracefully
+            // Use textContent assignment for robust escaping
+             const div = document.createElement('div');
+             div.textContent = str;
+             return div.innerHTML;
+         }
+         function capitalize(str) {
+            if (!str || typeof str !== 'string') return '';
+            return str.charAt(0).toUpperCase() + str.slice(1);
+         }
+         function showConfirmation(message) {
+            // Use the browser's built-in confirm dialog
+            return window.confirm(message);
+         }
+         function showToast(message, duration = 3000) {
+            // Simple toast implementation, consider using Bootstrap Toasts for better styling/features
+             const toast = document.createElement('div');
+             toast.textContent = message;
+             // Basic styling (can be enhanced)
+             toast.className = 'position-fixed bottom-0 end-0 m-3 p-3 rounded-3 shadow-lg text-white';
+             // Use Bootstrap background utility for success state
+              toast.classList.add('bg-success'); // Or 'bg-info', 'bg-warning', 'bg-danger'
+             toast.style.zIndex = '1100'; // Ensure above most elements (like modals)
+             toast.style.opacity = '0';
+             toast.style.transition = 'opacity 0.4s ease-in-out';
+
+             document.body.appendChild(toast);
+
+             // Fade in
+             setTimeout(() => {
+                 toast.style.opacity = '1';
+             }, 50); // Short delay to allow element rendering
+
+             // Fade out and remove
+             setTimeout(() => {
+                 toast.style.opacity = '0';
+                 // Remove from DOM after fade out transition completes
+                 toast.addEventListener('transitionend', () => {
+                     if (toast.parentNode) {
+                         toast.parentNode.removeChild(toast);
+                     }
+                 }, { once: true });
+             }, duration);
+         }
+         function showLoading(message = "Loading...") {
+            if (!loadingIndicatorEl) return;
+            const spinnerSpan = loadingIndicatorEl.querySelector('.visually-hidden');
+            if (spinnerSpan) spinnerSpan.textContent = message;
+             loadingIndicatorEl.classList.remove('d-none');
+             loadingIndicatorEl.classList.add('d-flex'); // Use d-flex to enable centering
+
+             // Safety timeout to prevent infinite loading indicator
+             // setTimeout(hideLoading, 15000); // 15 seconds
+         }
+         function hideLoading() {
+            if (!loadingIndicatorEl) return;
+             loadingIndicatorEl.classList.add('d-none');
+             loadingIndicatorEl.classList.remove('d-flex');
+         }
+
+
+        // ---- Particles.js Initialization ----
+         function initParticles(isDark) {
+            // Ensure particlesJS is loaded
+            if (typeof particlesJS === 'undefined') {
+                console.warn("particles.js not loaded. Skipping particle initialization.");
+                return;
+            }
+             // Define colors based on theme
+             const particleColor = isDark ? "#a0aec0" : "#ec4899"; // Grey for dark, Pink for light
+             const linkColor = isDark ? "#4a5568" : "#fbcfe8";     // Darker grey for dark, Lighter pink for light
+
+             // Destroy existing instance if it exists
+             if (window.pJSDom && window.pJSDom.length > 0 && window.pJSDom[0].pJS) {
+                 try {
+                    window.pJSDom[0].pJS.fn.vendors.destroypJS();
+                    window.pJSDom = []; // Clear the array
+                    // console.log("Destroyed existing particlesJS instance.");
+                 } catch (e) {
+                     console.error("Error destroying particlesJS instance:", e);
+                 }
+             }
+
+             // Initialize new instance
+              const particlesContainerId = 'particles-js';
+              const particlesElement = document.getElementById(particlesContainerId);
+              if (!particlesElement) {
+                  console.error(`Particles container #${particlesContainerId} not found.`);
+                  return;
+              }
+
+              try {
+                  particlesJS(particlesContainerId, {
+                     "particles": {
+                         "number": {"value": 60, "density": {"enable": true, "value_area": 800}},
+                         "color": {"value": particleColor},
+                         "shape": {"type": "circle"},
+                         "opacity": {"value": 0.4, "random": true, "anim": {"enable": true, "speed": 0.5, "opacity_min": 0.1,"sync": false}},
+                         "size": {"value": 3, "random": true},
+                         "line_linked": {"enable": true, "distance": 150, "color": linkColor, "opacity": 0.3, "width": 1},
+                         "move": {"enable": true, "speed": 2, "direction": "none", "random": false, "straight": false, "out_mode": "out", "bounce": false}
+                     },
+                     "interactivity": {
+                         "detect_on": "canvas",
+                         "events": {"onhover": {"enable": true, "mode": "grab"}, "onclick": {"enable": true, "mode": "push"}, "resize": true},
+                         "modes": {
+                            "grab": {"distance": 140, "line_linked": {"opacity": 0.7}},
+                            "bubble": {"distance": 400, "size": 40, "duration": 2, "opacity": 8, "speed": 3}, // Bubble mode example
+                            "repulse": {"distance": 200, "duration": 0.4}, // Repulse mode example
+                            "push": {"particles_nb": 4}, // Push mode
+                            "remove": {"particles_nb": 2} // Remove mode example
+                         }
+                     },
+                     "retina_detect": true
+                  });
+                   // console.log(`Initialized particlesJS on #${particlesContainerId} with dark=${isDark}`);
+              } catch (e) {
+                  console.error("Error initializing particlesJS:", e);
+              }
+         }
+
+
+        // ---- Counter Animation (Dashboard) ----
+        function animateCounters() {
+            const counters = document.querySelectorAll('.counter-value');
+            if (counters.length === 0) return;
+
+            const speed = 200; // Lower number = faster animation (fewer steps)
+
+            counters.forEach(counter => {
+                const target = +counter.textContent; // Get target value from element
+                if (isNaN(target)) return; // Skip if target is not a number
+
+                 counter.textContent = '0'; // Start from 0
+
+                 const animate = () => {
+                     const value = +counter.textContent; // Current displayed value
+                     // Calculate increment, ensure it's at least 1
+                     const increment = Math.max(1, Math.ceil(target / speed));
+
+                     if (value < target) {
+                         // Update text, ensuring not to exceed target
+                         counter.textContent = `${Math.min(value + increment, target)}`;
+                         requestAnimationFrame(animate); // Continue animation
+                     } else {
+                         counter.textContent = target; // Ensure final value is exact target
+                     }
+                 };
+                 requestAnimationFrame(animate); // Start the animation loop
+            });
+        }
+
+        // --- NO NEED for addHoverGroupCSS() ---
+        // The necessary styles (.group:hover .group-hover-opacity-100 etc.)
+        // are now included directly in the <style> block.
+
+    </script>
+
+</body>
+</html>
